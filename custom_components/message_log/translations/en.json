@@ -1,0 +1,40 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "remove_message_after_hours": "Remove message after",
+          "default_icon": "default message icon",
+          "scroll_messages_every_minutes": "scroll messages every",
+          "scroll_through_last_messages_count": "Scroll through last messages",
+          "markdown_message_list_count": "Markdown message list count"
+        }
+      }
+    }
+  },
+  "options": {
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "remove_message_after_hours": "Remove message after",
+          "default_icon": "default message icon",
+          "scroll_messages_every_minutes": "scroll messages every",
+          "scroll_through_last_messages_count": "Scroll through last messages",
+          "markdown_message_list_count": "Markdown message list count"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,101 @@
+# Service ID
+remove:
+  # Service name as shown in UI
+  name: Remove messages
+  # Description of the service
+  description: Remove all message from log.
+
+# Service ID
+add:
+  # Service name as shown in UI
+  name: Add
+  # Description of the service
+  description: Add message to log.
+  # Different fields that your service accepts
+  fields:
+    # Key of the field
+    message:
+      # Field name as shown in UI
+      name: Message
+      # Description of the field
+      description: Message to log
+      # Whether or not field is required (default = false)
+      required: true
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "Hello world"
+      # The default field value
+      default: "Hello world"
+      selector:
+        text:
+
+    # Key of the field
+    info_level:
+      # Field name as shown in UI
+      name: Info level
+      # Description of the field
+      description: Information level
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "Info"
+      # The default field value
+      default: "Info"
+      selector:
+        select:
+          options:
+            - "Info"
+            - "Warning"
+            - "Error"
+
+    # Key of the field
+    icon:
+      # Field name as shown in UI
+      name: Icon
+      # Description of the field
+      description: Message Icon to display
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "mdi:message-badge-outline"
+      # The default field value
+      default: "mdi:message-badge-outline"
+      selector:
+        icon:
+
+    # Key of the field
+    remove_after:
+      # Field name as shown in UI
+      name: Remove after
+      # Description of the field
+      description: Remove message after
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: 24
+      # The default field value
+      default: 24
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "hours"
+
+    # Key of the field
+    notify:
+      # Field name as shown in UI
+      name: Notify
+      # Description of the field
+      description: Create a notification
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: false
+      # The default field value
+      default: false
+      selector:
+        boolean:

@@ -1,0 +1,14 @@
+{
+  "domain": "message_log",
+  "name": "Message log",
+  "codeowners": ["@kgn3400"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/kgn3400/message_log",
+  "homekit": {},
+  "iot_class": "cloud_push",
+  "requirements": ["jsonpickle"],
+  "ssdp": [],
+  "version": "1.0.0",
+  "zeroconf": []
+}
