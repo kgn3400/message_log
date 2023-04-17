@@ -29,7 +29,7 @@ class ComponentApi:
         self.entry: ConfigEntry = entry
 
         self.coordinator: DataUpdateCoordinator
-        self.scroll_message_pos: int = -1
+        self.scroll_message_pos: int = 0
         self.markdown: str = ""
         self.markdown_message_list: str = ""
         self.settings: MessageLogSettings = MessageLogSettings()
@@ -172,7 +172,7 @@ class ComponentApi:
     # ------------------------------------------------------------------
     def update_scroll_message_pos(self) -> None:
         """Update scroll message pos."""
-        if len(self.settings.message_list) > 0:
+        if len(self.settings.message_list) > 1:
             self.scroll_message_pos += 1
 
             if self.scroll_message_pos >= len(
@@ -182,7 +182,7 @@ class ComponentApi:
             ):
                 self.scroll_message_pos = 0
         else:
-            self.scroll_message_pos = -1
+            self.scroll_message_pos = 0
 
     # ------------------------------------------------------------------
     def get_message(self, num: int = 0) -> str:
