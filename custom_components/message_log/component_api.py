@@ -14,7 +14,7 @@ from .const import (
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
 )
-from .message_log_settings import InfoLevels, MessageItem, MessageLogSettings
+from .message_log_settings import MessageItem, MessageLogSettings
 
 
 # ------------------------------------------------------------------
@@ -45,19 +45,19 @@ class ComponentApi:
         if diff < timedelta(seconds=10):
             return "lige nu"
         elif diff < timedelta(minutes=1):
-            return f"{diff.seconds} sekund siden"
+            return f"for {diff.seconds} sekund siden"
         elif diff < timedelta(hours=1):
             minutes = diff.seconds // 60
-            return f"{minutes} minut{'ter' if minutes != 1 else ''} siden"
+            return f"for {minutes} minut{'ter' if minutes != 1 else ''} siden"
         elif diff < timedelta(days=1):
             hours = diff.seconds // 3600
-            return f"{hours} time{'r' if hours != 1 else ''} siden"
+            return f"for {hours} time{'r' if hours != 1 else ''} siden"
         elif diff < timedelta(weeks=1):
             days = diff.days
-            return f"{days} dag{'e' if days != 1 else ''} siden"
+            return f"for {days} dag{'e' if days != 1 else ''} siden"
         else:
             weeks = diff.days // 7
-            return f"{weeks} uge{'r' if weeks != 1 else ''} siden"
+            return f"for {weeks} uge{'r' if weeks != 1 else ''} siden"
 
     # ------------------------------------------------------------------
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
@@ -105,37 +105,22 @@ class ComponentApi:
     def update_markdown(self) -> None:
         """Update markdown."""
 
+        # Latest message
         if len(self.settings.message_list) > 0:
-            match self.settings.message_list[0].info_level:
-                case InfoLevels.INFO:
-                    tmp_col: str = "limegreen"
-                case InfoLevels.WARNING:
-                    tmp_col = "orange"
-                case InfoLevels.ERROR:
-                    tmp_col = "orangered"
-                case _:
-                    tmp_col = "blue"
+            item: MessageItem = self.settings.message_list[0]
 
             self.markdown = (
                 "## Besked\n"
-                f'-  <font color={tmp_col}>  <ha-icon icon="{self.settings.message_list[0].icon}"></ha-icon></font> <font size=3>Sidste besked: **{self.settings.message_list[0].message}**</font>\n'
-                f"Modtaget for {self.relative_time(self.settings.message_list[0].added_at)}.\n\n"
+                f'-  <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
+                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
             )
 
+            # Scroll message
             if len(self.settings.message_list) > 1:
-                match self.settings.message_list[self.scroll_message_pos].info_level:
-                    case InfoLevels.INFO:
-                        tmp_col: str = "limegreen"
-                    case InfoLevels.WARNING:
-                        tmp_col = "orange"
-                    case InfoLevels.ERROR:
-                        tmp_col = "orangered"
-                    case _:
-                        tmp_col = "blue"
-
+                item: MessageItem = self.settings.message_list[self.scroll_message_pos]
                 self.markdown += (
-                    f'- <font color={tmp_col}>  <ha-icon icon="{self.settings.message_list[self.scroll_message_pos].icon}"></ha-icon></font> Beskeder: **{self.settings.message_list[self.scroll_message_pos].message}**\n'
-                    f"Modtaget for {self.relative_time(self.settings.message_list[self.scroll_message_pos].added_at)}. "
+                    f'- <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
+                    f"Modtaget {self.relative_time(item.added_at)}. "
                 )
         else:
             self.markdown = "## Besked\n"
@@ -151,19 +136,9 @@ class ComponentApi:
                 ):
                     break
 
-                match item.info_level:
-                    case InfoLevels.INFO:
-                        tmp_col: str = "limegreen"
-                    case InfoLevels.WARNING:
-                        tmp_col = "orange"
-                    case InfoLevels.ERROR:
-                        tmp_col = "orangered"
-                    case _:
-                        tmp_col = "blue"
-
                 self.markdown_message_list += (
-                    f'- <font color={tmp_col}>  <ha-icon icon="{item.icon}"></ha-icon></font> **{item.message}**\n'
-                    f"Modtaget for {self.relative_time(item.added_at)}.\n"
+                    f'- <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> **{item.message}**\n'
+                    f"Modtaget {self.relative_time(item.added_at)}.\n"
                 )
                 count_pos += 1
         else:
@@ -180,9 +155,9 @@ class ComponentApi:
             ) or self.scroll_message_pos >= self.entry.options.get(
                 CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5
             ):
-                self.scroll_message_pos = 0
+                self.scroll_message_pos = 1
         else:
-            self.scroll_message_pos = 0
+            self.scroll_message_pos = 1
 
     # ------------------------------------------------------------------
     def get_message(self, num: int = 0) -> str:

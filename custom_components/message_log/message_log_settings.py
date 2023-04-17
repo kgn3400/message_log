@@ -41,21 +41,26 @@ class MessageItem:
             except KeyError:
                 tmp_info_level = InfoLevels.INFO
 
-        # if info_level is None or info_level == "":
-        #     info_level = "Info"
-
-        # if notify is None or notify == "":
-        #     notify = False
-
-        # if icon is None or icon == "":
-        #     icon = self.STD_ICON
-
         self.message: str = message
         self.info_level: InfoLevels = tmp_info_level
         self.icon: str = icon
         self.remove_after: timedelta = timedelta(hours=remove_after)
         self.notify: bool = notify
         self.added_at: datetime = datetime.now()
+
+    # ------------------------------------------------------
+    @property
+    def info_level_color(self):
+        """Info level color."""
+        match self.info_level:
+            case InfoLevels.INFO:
+                return "limegreen"
+            case InfoLevels.WARNING:
+                return "orange"
+            case InfoLevels.ERROR:
+                return "orangered"
+            case _:
+                return "blue"
 
 
 # ------------------------------------------------------
