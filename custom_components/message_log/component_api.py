@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .const import (
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
+    CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
 )
 from .message_log_settings import InfoLevels, MessageItem, MessageLogSettings
@@ -139,6 +140,7 @@ class ComponentApi:
         else:
             self.markdown = "## Besked\n"
 
+        # Create markdown list
         if len(self.settings.message_list) > 0:
             count_pos: int = 1
             self.markdown_message_list = "## Beskeder\n"
@@ -173,7 +175,11 @@ class ComponentApi:
         if len(self.settings.message_list) > 0:
             self.scroll_message_pos += 1
 
-            if self.scroll_message_pos >= len(self.settings.message_list):
+            if self.scroll_message_pos >= len(
+                self.settings.message_list
+            ) or self.scroll_message_pos >= self.entry.options.get(
+                CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5
+            ):
                 self.scroll_message_pos = 0
         else:
             self.scroll_message_pos = -1
