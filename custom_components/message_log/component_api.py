@@ -36,7 +36,7 @@ class ComponentApi:
         self.settings.read_settings(hass.config.path(STORAGE_DIR, DOMAIN))
 
     # ------------------------------------------------------------------
-    def relative_time(self, date_time: datetime):
+    def relative_time(self, date_time: datetime) -> str:
         """Relative time."""
 
         now = datetime.now()
@@ -169,10 +169,36 @@ class ComponentApi:
         )
 
     # ------------------------------------------------------------------
-    def get_scroll_message(self, num: int = 0) -> str:
+    @property
+    def message_last(self) -> str:
+        """Message last."""
+        return self.get_message(0)
+
+    # ------------------------------------------------------------------
+    @property
+    def message_last_icon(self) -> str:
+        """Message last icon."""
+        if len(self.settings.message_list) > 0:
+            return self.settings.message_list[0].icon
+
+        return "mdi:message-off-outline"
+
+    # ------------------------------------------------------------------
+    @property
+    def message_scroll(self) -> str:
         """Get scroll message."""
 
         if len(self.settings.message_list) > 0:
             return self.settings.message_list[self.scroll_message_pos].message
 
         return ""
+
+    # ------------------------------------------------------------------
+    @property
+    def message_scroll_icon(self) -> str:
+        """Get scroll message icon."""
+
+        if len(self.settings.message_list) > 0:
+            return self.settings.message_list[self.scroll_message_pos].icon
+
+        return "mdi:message-off-outline"

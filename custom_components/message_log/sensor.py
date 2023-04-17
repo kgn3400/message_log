@@ -66,14 +66,14 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
     def icon(self) -> str:
         """Icon."""
 
-        return "mdi:message-outline"
+        return self.component_api.message_last_icon
 
     # ------------------------------------------------------
     @property
     def native_value(self) -> str:
         """Native value."""
 
-        return self.component_api.get_message()
+        return self.component_api.message_last
 
     # ------------------------------------------------------
     @property
@@ -158,14 +158,14 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
     def icon(self) -> str:
         """Icon."""
 
-        return "mdi:message-outline"
+        return self.component_api.message_scroll_icon
 
     # ------------------------------------------------------
     @property
     def native_value(self) -> str:
         """Native value."""
 
-        return self.component_api.get_scroll_message()
+        return self.component_api.message_scroll
 
     # ------------------------------------------------------
     @property
