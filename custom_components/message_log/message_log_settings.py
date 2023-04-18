@@ -31,6 +31,7 @@ class MessageItem:
         icon: str = "mdi:message-badge-outline",
         remove_after: float = 24,
         notify: bool = False,
+        added_at: datetime | None = None,
     ) -> None:
         """Message data."""
         tmp_info_level: InfoLevels = InfoLevels.INFO
@@ -46,7 +47,11 @@ class MessageItem:
         self.icon: str = icon
         self.remove_after: timedelta = timedelta(hours=remove_after)
         self.notify: bool = notify
-        self.added_at: datetime = datetime.now()
+
+        if added_at is None:
+            self.added_at: datetime = datetime.now()
+        else:
+            self.added_at: datetime = added_at
 
     # ------------------------------------------------------
     @property

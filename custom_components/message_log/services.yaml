@@ -99,3 +99,18 @@ add:
       default: false
       selector:
         boolean:
+
+    # Key of the field
+    added_at:
+      # Field name as shown in UI
+      name: Added at
+      # Description of the field
+      description: Added at timestamp
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "2023-04-18 22:00:00"
+      default: "2023-04-18 22:00:00"
+      selector:
+        datetime:

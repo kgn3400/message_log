@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+import pytz
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.storage import STORAGE_DIR
@@ -69,12 +71,23 @@ class ComponentApi:
     # ------------------------------------------------------------------
     async def async_add_message_service(self, call: ServiceCall) -> None:
         """Message log add service."""
+
         tmp_dict = call.data.copy()
 
-        if tmp_dict.get("remove_after", None) is None:
+        if "remove_after" not in tmp_dict:
             tmp_dict["remove_after"] = self.entry.options.get(
                 CONF_REMOVE_MESSAGE_AFTER_HOURS, 24
             )
+
+        if "added_at" in tmp_dict:
+            tmp_dict["added_at"] = datetime.strptime(
+                tmp_dict["added_at"],
+                # 2023-04-13 22:00:00
+                "%Y-%m-%d %H:%M:%S",
+            )
+
+            timezonex = pytz.timezone(self.hass.config.time_zone)
+            tmp_dict["added_at"] -= timezonex.localize(tmp_dict["added_at"]).utcoffset()  # type: ignore
 
         self.settings.message_list.insert(0, MessageItem(**tmp_dict))
         self.settings.write_settings()
@@ -188,7 +201,7 @@ class ComponentApi:
     def message_scroll(self) -> str:
         """Get scroll message."""
 
-        if len(self.settings.message_list) > 0:
+        if len(self.settings.message_list) > 1:
             return self.settings.message_list[self.scroll_message_pos].message
 
         return ""
@@ -198,7 +211,7 @@ class ComponentApi:
     def message_scroll_icon(self) -> str:
         """Get scroll message icon."""
 
-        if len(self.settings.message_list) > 0:
+        if len(self.settings.message_list) > 1:
             return self.settings.message_list[self.scroll_message_pos].icon
 
         return "mdi:message-off-outline"
