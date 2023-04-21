@@ -9,6 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.selector import (
     IconSelector,
     NumberSelector,
@@ -19,6 +20,7 @@ from homeassistant.helpers.selector import (
 from .const import (
     CONF_DEFAULT_ICON,
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
+    CONF_ORDER_BY_INFO_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
@@ -96,6 +98,10 @@ def _create_form(
                 CONF_DEFAULT_ICON,
                 default=user_input.get(CONF_DEFAULT_ICON, "mdi:message-badge-outline"),
             ): IconSelector(),
+            vol.Required(
+                CONF_ORDER_BY_INFO_LEVEL,
+                default=user_input.get(CONF_ORDER_BY_INFO_LEVEL, True),
+            ): cv.boolean,
         }
     )
 

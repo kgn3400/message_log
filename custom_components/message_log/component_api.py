@@ -3,8 +3,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-import pytz
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.storage import STORAGE_DIR
@@ -12,11 +10,12 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
+    CONF_ORDER_BY_INFO_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
 )
-from .message_log_settings import MessageItem, MessageLogSettings
+from .message_log_settings import InfoLevels, MessageItem, MessageLogSettings
 
 
 # ------------------------------------------------------------------
@@ -34,6 +33,7 @@ class ComponentApi:
         self.scroll_message_pos: int = 0
         self.markdown: str = ""
         self.markdown_message_list: str = ""
+        self.message_list_sorted: list[MessageItem] = []
         self.settings: MessageLogSettings = MessageLogSettings()
         self.settings.read_settings(hass.config.path(STORAGE_DIR, DOMAIN))
 
@@ -65,6 +65,7 @@ class ComponentApi:
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
         """Remove nessage service."""
         self.settings.message_list.clear()
+        self.settings.set_highest_info_level()
         self.settings.write_settings()
         await self.coordinator.async_refresh()
 
@@ -86,10 +87,13 @@ class ComponentApi:
                 "%Y-%m-%d %H:%M:%S",
             )
 
-            timezonex = pytz.timezone(self.hass.config.time_zone)
-            tmp_dict["added_at"] -= timezonex.localize(tmp_dict["added_at"]).utcoffset()  # type: ignore
+            # Hvorfor er denne bid kun nødvendig i udviklings miløet ??
+            # timezonex = pytz.timezone(self.hass.config.time_zone)
+            # tmp_off = timezonex.localize(tmp_dict["added_at"]).utcoffset()
+            # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())  # type: ignore
 
         self.settings.message_list.insert(0, MessageItem(**tmp_dict))
+        self.settings.set_highest_info_level()
         self.settings.write_settings()
         await self.coordinator.async_refresh()
 
@@ -112,25 +116,29 @@ class ComponentApi:
                 del self.settings.message_list[index]
 
         if save_settings:
+            self.settings.set_highest_info_level()
             self.settings.write_settings()
 
     # ------------------------------------------------------------------
     def update_markdown(self) -> None:
         """Update markdown."""
+        self.create_sorted_message_list(
+            self.entry.options.get(CONF_ORDER_BY_INFO_LEVEL, True)
+        )
 
         # Latest message
-        if len(self.settings.message_list) > 0:
-            item: MessageItem = self.settings.message_list[0]
+        if len(self.message_list_sorted) > 0:
+            item: MessageItem = self.message_list_sorted[0]
 
             self.markdown = (
-                "## Besked\n"
+                f'## <font color={self.settings.highest_info_level_color}>  <ha-icon icon="mdi:message"></ha-icon></font> Besked\n'
                 f'-  <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
                 f"Modtaget {self.relative_time(item.added_at)}.\n\n"
             )
 
             # Scroll message
-            if len(self.settings.message_list) > 1:
-                item: MessageItem = self.settings.message_list[self.scroll_message_pos]
+            if len(self.message_list_sorted) > 1:
+                item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
                 self.markdown += (
                     f'- <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
                     f"Modtaget {self.relative_time(item.added_at)}. "
@@ -139,11 +147,11 @@ class ComponentApi:
             self.markdown = "## Besked\n"
 
         # Create markdown list
-        if len(self.settings.message_list) > 0:
+        if len(self.message_list_sorted) > 0:
             count_pos: int = 1
             self.markdown_message_list = "## Beskeder\n"
 
-            for item in self.settings.message_list:
+            for item in self.message_list_sorted:
                 if count_pos > self.entry.options.get(
                     CONF_MARKDOWN_MESSAGE_LIST_COUNT, 10
                 ):
@@ -156,6 +164,27 @@ class ComponentApi:
                 count_pos += 1
         else:
             self.markdown_message_list = "## Beskeder\n"
+
+        self.message_list_sorted.clear()
+
+    # ------------------------------------------------------------------
+    def create_sorted_message_list(self, order_by_info_level: bool = True) -> None:
+        """Create."""
+
+        if order_by_info_level:
+            self.message_list_sorted.clear()
+
+            for info_level in reversed(InfoLevels):
+                self.message_list_sorted.extend(
+                    [
+                        x
+                        for x in self.settings.message_list
+                        if x.info_level == info_level
+                    ]
+                )
+
+        else:
+            self.message_list_sorted = self.settings.message_list
 
     # ------------------------------------------------------------------
     def update_scroll_message_pos(self) -> None:

@@ -12,6 +12,7 @@ class InfoLevels(Enum):
     """Info levels."""
 
     INFO = "Info"
+    ATTENTION = "Attention"
     WARNING = "Warning"
     ERROR = "Error"
 
@@ -55,27 +56,62 @@ class MessageItem:
 
     # ------------------------------------------------------
     @property
-    def info_level_color(self):
+    def info_level_color(self) -> str:
         """Info level color."""
         match self.info_level:
             case InfoLevels.INFO:
                 return "limegreen"
+            case InfoLevels.ATTENTION:
+                return "blue"
             case InfoLevels.WARNING:
                 return "orange"
             case InfoLevels.ERROR:
                 return "orangered"
             case _:
-                return "blue"
+                return "red"
 
 
 # ------------------------------------------------------
 # ------------------------------------------------------
+@dataclass
 class MessageLogSettings(SettingsJson):
     """MessageLogSettings."""
 
+    # ------------------------------------------------------
     def __init__(self) -> None:
         """Message log settings."""
 
         super().__init__()
 
+        self.highest_info_level: InfoLevels = InfoLevels.INFO
         self.message_list: list[MessageItem] = []
+
+    # ------------------------------------------------------
+    def set_highest_info_level(self) -> None:
+        """Check for highest info level."""
+        self.highest_info_level = InfoLevels.INFO
+
+        for item in self.message_list:
+            if item.info_level == InfoLevels.WARNING:
+                self.highest_info_level = item.info_level
+            elif item.info_level == InfoLevels.ATTENTION:
+                self.highest_info_level = item.info_level
+            elif item.info_level == InfoLevels.ERROR:
+                self.highest_info_level = item.info_level
+                break
+
+    # ------------------------------------------------------
+    @property
+    def highest_info_level_color(self) -> str:
+        """Highest Info level color."""
+        match self.highest_info_level:
+            case InfoLevels.INFO:
+                return "limegreen"
+            case InfoLevels.ATTENTION:
+                return "blue"
+            case InfoLevels.WARNING:
+                return "orange"
+            case InfoLevels.ERROR:
+                return "orangered"
+            case _:
+                return "red"
