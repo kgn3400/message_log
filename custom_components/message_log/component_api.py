@@ -10,12 +10,12 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
-    CONF_ORDER_BY_INFO_LEVEL,
+    CONF_ORDER_BY_MESSAGE_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
 )
-from .message_log_settings import InfoLevels, MessageItem, MessageLogSettings
+from .message_log_settings import MessageItem, MessageLevel, MessageLogSettings
 
 
 # ------------------------------------------------------------------
@@ -65,7 +65,7 @@ class ComponentApi:
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
         """Remove nessage service."""
         self.settings.message_list.clear()
-        self.settings.set_highest_info_level()
+        self.settings.set_highest_message_level()
         self.settings.write_settings()
         await self.coordinator.async_refresh()
 
@@ -93,7 +93,7 @@ class ComponentApi:
             # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())  # type: ignore
 
         self.settings.message_list.insert(0, MessageItem(**tmp_dict))
-        self.settings.set_highest_info_level()
+        self.settings.set_highest_message_level()
         self.settings.write_settings()
         await self.coordinator.async_refresh()
 
@@ -116,14 +116,14 @@ class ComponentApi:
                 del self.settings.message_list[index]
 
         if save_settings:
-            self.settings.set_highest_info_level()
+            self.settings.set_highest_message_level()
             self.settings.write_settings()
 
     # ------------------------------------------------------------------
     def update_markdown(self) -> None:
         """Update markdown."""
         self.create_sorted_message_list(
-            self.entry.options.get(CONF_ORDER_BY_INFO_LEVEL, True)
+            self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
         )
 
         # Latest message
@@ -131,8 +131,8 @@ class ComponentApi:
             item: MessageItem = self.message_list_sorted[0]
 
             self.markdown = (
-                f'## <font color={self.settings.highest_info_level_color}>  <ha-icon icon="mdi:message"></ha-icon></font> Besked\n'
-                f'-  <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
+                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message"></ha-icon></font> Besked\n'
+                f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
                 f"Modtaget {self.relative_time(item.added_at)}.\n\n"
             )
 
@@ -140,7 +140,7 @@ class ComponentApi:
             if len(self.message_list_sorted) > 1:
                 item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
                 self.markdown += (
-                    f'- <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
+                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
                     f"Modtaget {self.relative_time(item.added_at)}. "
                 )
         else:
@@ -158,7 +158,7 @@ class ComponentApi:
                     break
 
                 self.markdown_message_list += (
-                    f'- <font color={item.info_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> **{item.message}**\n'
+                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> **{item.message}**\n'
                     f"Modtaget {self.relative_time(item.added_at)}.\n"
                 )
                 count_pos += 1
@@ -168,18 +168,18 @@ class ComponentApi:
         self.message_list_sorted.clear()
 
     # ------------------------------------------------------------------
-    def create_sorted_message_list(self, order_by_info_level: bool = True) -> None:
+    def create_sorted_message_list(self, order_by_message_level: bool = True) -> None:
         """Create."""
 
-        if order_by_info_level:
+        if order_by_message_level:
             self.message_list_sorted.clear()
 
-            for info_level in reversed(InfoLevels):
+            for message_level in reversed(MessageLevel):
                 self.message_list_sorted.extend(
                     [
                         x
                         for x in self.settings.message_list
-                        if x.info_level == info_level
+                        if x.message_level == message_level
                     ]
                 )
 

@@ -2,19 +2,53 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
+from functools import total_ordering
 
 from .settings_json import SettingsJson
 
 
 # ------------------------------------------------------
 # ------------------------------------------------------
-class InfoLevels(Enum):
-    """Info levels."""
+@total_ordering
+class EnumExt(Enum):
+    """Enu ext."""
 
-    INFO = "Info"
-    ATTENTION = "Attention"
-    WARNING = "Warning"
-    ERROR = "Error"
+    def __lt__(self, other):
+        """Lower than."""
+        try:
+            return self.value < other.value
+        except AttributeError:
+            return self.value < other
+
+    def __eq__(self, other):
+        """Equal."""
+        try:
+            return self.value == other.value
+        except AttributeError:
+            return self.value == other
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+class MessageLevel(EnumExt):
+    """Message levels."""
+
+    INFO = 10
+    ATTENTION = 20
+    WARNING = 30
+    ERROR = 40
+
+    # ------------------------------------------------------
+    @property
+    def color(self) -> str:
+        """Color."""
+        message_level_to_color___: dict = {
+            self.INFO.name: "limegreen",
+            self.ATTENTION.name: "deepskyblue",
+            self.WARNING.name: "orange",
+            self.ERROR.name: "orangered",
+        }
+        return message_level_to_color___[self.name]
 
 
 # ------------------------------------------------------
@@ -28,23 +62,23 @@ class MessageItem:
     def __init__(
         self,
         message: str,
-        info_level: InfoLevels | str = InfoLevels.INFO,
+        message_level: MessageLevel | str = MessageLevel.INFO,
         icon: str = "mdi:message-badge-outline",
         remove_after: float = 24,
         notify: bool = False,
         added_at: datetime | None = None,
     ) -> None:
         """Message data."""
-        tmp_info_level: InfoLevels = InfoLevels.INFO
+        tmp_message_level: MessageLevel = MessageLevel.INFO
 
-        if isinstance(info_level, str):
+        if isinstance(message_level, str):
             try:
-                tmp_info_level = InfoLevels[info_level.upper()]
+                tmp_message_level = MessageLevel[message_level.upper()]
             except KeyError:
-                tmp_info_level = InfoLevels.INFO
+                tmp_message_level = MessageLevel.INFO
 
         self.message: str = message
-        self.info_level: InfoLevels = tmp_info_level
+        self.message_level: MessageLevel = tmp_message_level
         self.icon: str = icon
         self.remove_after: timedelta = timedelta(hours=remove_after)
         self.notify: bool = notify
@@ -56,19 +90,10 @@ class MessageItem:
 
     # ------------------------------------------------------
     @property
-    def info_level_color(self) -> str:
-        """Info level color."""
-        match self.info_level:
-            case InfoLevels.INFO:
-                return "limegreen"
-            case InfoLevels.ATTENTION:
-                return "blue"
-            case InfoLevels.WARNING:
-                return "orange"
-            case InfoLevels.ERROR:
-                return "orangered"
-            case _:
-                return "red"
+    def message_level_color(self) -> str:
+        """Message level color."""
+
+        return self.message_level.color
 
 
 # ------------------------------------------------------
@@ -83,35 +108,30 @@ class MessageLogSettings(SettingsJson):
 
         super().__init__()
 
-        self.highest_info_level: InfoLevels = InfoLevels.INFO
+        self.highest_message_level: MessageLevel = MessageLevel.INFO
         self.message_list: list[MessageItem] = []
 
     # ------------------------------------------------------
-    def set_highest_info_level(self) -> None:
-        """Check for highest info level."""
-        self.highest_info_level = InfoLevels.INFO
+    def set_highest_message_level(self) -> None:
+        """Check for highest message level."""
+        self.highest_message_level = MessageLevel.INFO
 
         for item in self.message_list:
-            if item.info_level == InfoLevels.WARNING:
-                self.highest_info_level = item.info_level
-            elif item.info_level == InfoLevels.ATTENTION:
-                self.highest_info_level = item.info_level
-            elif item.info_level == InfoLevels.ERROR:
-                self.highest_info_level = item.info_level
-                break
+            if item.message_level > self.highest_message_level:
+                self.highest_message_level = item.message_level
+
+                if self.highest_message_level == MessageLevel.ERROR:
+                    break
+            # if item.message_level == MessageLevel.WARNING:
+            #     self.highest_message_level = item.message_level
+            # elif item.message_level == MessageLevel.ATTENTION:
+            #     self.highest_message_level = item.message_level
+            # elif item.message_level == MessageLevel.ERROR:
+            #     self.highest_message_level = item.message_level
+            #     break
 
     # ------------------------------------------------------
     @property
-    def highest_info_level_color(self) -> str:
-        """Highest Info level color."""
-        match self.highest_info_level:
-            case InfoLevels.INFO:
-                return "limegreen"
-            case InfoLevels.ATTENTION:
-                return "blue"
-            case InfoLevels.WARNING:
-                return "orange"
-            case InfoLevels.ERROR:
-                return "orangered"
-            case _:
-                return "red"
+    def highest_message_level_color(self) -> str:
+        """Highest message level color."""
+        return self.highest_message_level.color

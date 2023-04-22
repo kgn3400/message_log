@@ -20,7 +20,7 @@ from homeassistant.helpers.selector import (
 from .const import (
     CONF_DEFAULT_ICON,
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
-    CONF_ORDER_BY_INFO_LEVEL,
+    CONF_ORDER_BY_MESSAGE_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
@@ -99,8 +99,8 @@ def _create_form(
                 default=user_input.get(CONF_DEFAULT_ICON, "mdi:message-badge-outline"),
             ): IconSelector(),
             vol.Required(
-                CONF_ORDER_BY_INFO_LEVEL,
-                default=user_input.get(CONF_ORDER_BY_INFO_LEVEL, True),
+                CONF_ORDER_BY_MESSAGE_LEVEL,
+                default=user_input.get(CONF_ORDER_BY_MESSAGE_LEVEL, True),
             ): cv.boolean,
         }
     )

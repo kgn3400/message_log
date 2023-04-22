@@ -14,7 +14,7 @@
           "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
-          "order_by_info_level": "Order by info level"
+          "order_by_message_level": "Order by message level"
         }
       }
     }
@@ -34,7 +34,7 @@
           "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
-          "order_by_info_level": "Order by info level"
+          "order_by_message_level": "Order by message level"
         }
       }
     }
