@@ -82,6 +82,12 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         attr: dict = {}
 
+        if self.component_api.message_level_last:
+            attr["message_level_last"] = self.component_api.message_level_last
+
+        if self.component_api.highest_message_level:
+            attr["highest__message_level"] = self.component_api.highest_message_level
+
         if self.component_api.markdown:
             attr["markdown"] = self.component_api.markdown
 

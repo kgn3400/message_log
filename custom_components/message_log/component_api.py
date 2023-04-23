@@ -64,7 +64,17 @@ class ComponentApi:
     # ------------------------------------------------------------------
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
         """Remove nessage service."""
-        self.settings.message_list.clear()
+        if "message_level" in call.data:
+            tmp_message_level: MessageLevel = MessageLevel[
+                call.data.get("message_level", "INFO").upper()
+            ]
+
+            for index, item in reversed(list(enumerate(self.settings.message_list))):
+                if item.message_level == tmp_message_level:
+                    del self.settings.message_list[index]
+        else:
+            self.settings.message_list.clear()
+
         self.settings.set_highest_message_level()
         self.settings.write_settings()
         await self.coordinator.async_refresh()
@@ -126,30 +136,18 @@ class ComponentApi:
             self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
         )
 
-        # Latest message
-        if len(self.message_list_sorted) > 0:
-            item: MessageItem = self.message_list_sorted[0]
+        self.create_markdown_latest_and_scroll()
+        self.create_markdown_message_list()
 
-            self.markdown = (
-                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message"></ha-icon></font> Besked\n'
-                f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
-                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
-            )
+        self.message_list_sorted.clear()
 
-            # Scroll message
-            if len(self.message_list_sorted) > 1:
-                item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
-                self.markdown += (
-                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
-                    f"Modtaget {self.relative_time(item.added_at)}. "
-                )
-        else:
-            self.markdown = "## Besked\n"
-
+    # ------------------------------------------------------------------
+    def create_markdown_message_list(self) -> None:
+        """Markdown message list."""
         # Create markdown list
         if len(self.message_list_sorted) > 0:
             count_pos: int = 1
-            self.markdown_message_list = "## Beskeder\n"
+            self.markdown_message_list = f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Beskeder\n'
 
             for item in self.message_list_sorted:
                 if count_pos > self.entry.options.get(
@@ -163,13 +161,34 @@ class ComponentApi:
                 )
                 count_pos += 1
         else:
-            self.markdown_message_list = "## Beskeder\n"
+            self.markdown_message_list = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
-        self.message_list_sorted.clear()
+    # ------------------------------------------------------------------
+    def create_markdown_latest_and_scroll(self) -> None:
+        """Markdown latest and scroll."""
+        # Latest message
+        if len(self.message_list_sorted) > 0:
+            item: MessageItem = self.message_list_sorted[0]
+
+            self.markdown = (
+                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
+                f'-  <font color={self.message_level_color_last}>  <ha-icon icon="{self.message_last_icon}"></ha-icon></font> <font size=3>Sidste besked: **{self.message_last}**</font>\n'
+                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
+            )
+
+            # Scroll message
+            if len(self.message_list_sorted) > 1:
+                item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
+                self.markdown += (
+                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
+                    f"Modtaget {self.relative_time(item.added_at)}. "
+                )
+        else:
+            self.markdown = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
     # ------------------------------------------------------------------
     def create_sorted_message_list(self, order_by_message_level: bool = True) -> None:
-        """Create."""
+        """Create sorted message list."""
 
         if order_by_message_level:
             self.message_list_sorted.clear()
@@ -224,6 +243,32 @@ class ComponentApi:
             return self.settings.message_list[0].icon
 
         return "mdi:message-off-outline"
+
+    # ------------------------------------------------------------------
+    @property
+    def message_level_last(self) -> str:
+        """Message level last."""
+        return (
+            self.settings.message_list[0].message_level.name.capitalize()
+            if len(self.settings.message_list) > 0
+            else ""
+        )
+
+    # ------------------------------------------------------------------
+    @property
+    def message_level_color_last(self) -> str:
+        """Message level color last."""
+        return (
+            self.settings.message_list[0].message_level.color
+            if len(self.settings.message_list) > 0
+            else MessageLevel.INFO.color
+        )
+
+    # ------------------------------------------------------------------
+    @property
+    def highest_message_level(self) -> str:
+        """Highest message level."""
+        return self.settings.highest_message_level.name.capitalize()
 
     # ------------------------------------------------------------------
     @property

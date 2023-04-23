@@ -48,6 +48,7 @@ class MessageLevel(EnumExt):
             self.WARNING.name: "orange",
             self.ERROR.name: "orangered",
         }
+
         return message_level_to_color___[self.name]
 
 
@@ -92,7 +93,6 @@ class MessageItem:
     @property
     def message_level_color(self) -> str:
         """Message level color."""
-
         return self.message_level.color
 
 

@@ -3,8 +3,29 @@ remove:
   # Service name as shown in UI
   name: Remove messages
   # Description of the service
-  description: Remove all message from log.
-
+  description: Remove message from log.
+  # Different fields that your service accepts
+  fields:
+    # Key of the field
+    message_level:
+      # Field name as shown in UI
+      name: Message level
+      # Description of the field
+      description: Remove specific Message levels
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "Info"
+      # The default field value
+      default: "Info"
+      selector:
+        select:
+          options:
+            - "Info"
+            - "Attention"
+            - "Warning"
+            - "Error"
 # Service ID
 add:
   # Service name as shown in UI
