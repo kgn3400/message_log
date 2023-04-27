@@ -167,12 +167,12 @@ class ComponentApi:
     def create_markdown_latest_and_scroll(self) -> None:
         """Markdown latest and scroll."""
         # Latest message
-        if len(self.message_list_sorted) > 0:
-            item: MessageItem = self.message_list_sorted[0]
+        if len(self.settings.message_list) > 0:
+            item: MessageItem = self.settings.message_list[0]
 
             self.markdown = (
                 f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
-                f'-  <font color={self.message_level_color_last}>  <ha-icon icon="{self.message_last_icon}"></ha-icon></font> <font size=3>Sidste besked: **{self.message_last}**</font>\n'
+                f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
                 f"Modtaget {self.relative_time(item.added_at)}.\n\n"
             )
 
