@@ -1,4 +1,59 @@
 # Service ID
+orderby:
+  # Service name as shown in UI
+  name: Order by
+  # Description of the service
+  description: Order message list by.
+  # Different fields that your service accepts
+  fields:
+    # Key of the field
+    orderby:
+      # Field name as shown in UI
+      name: Order by
+      # Description of the field
+      description: Order message list by
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "Message_level"
+      # The default field value
+      default: "Message_level"
+      selector:
+        select:
+          options:
+            - "Message_level"
+            - "Added_at"
+# Service ID
+show:
+  # Service name as shown in UI
+  name: Show messages
+  # Description of the service
+  description: Messages to show.
+  # Different fields that your service accepts
+  fields:
+    # Key of the field
+    show:
+      # Field name as shown in UI
+      name: Show messages
+      # Description of the field
+      description: Messages to show
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: "All"
+      # The default field value
+      default: "All"
+      selector:
+        select:
+          options:
+            - "Info"
+            - "Attention"
+            - "Warning"
+            - "Error"
+            - "All"
+# Service ID
 remove:
   # Service name as shown in UI
   name: Remove messages

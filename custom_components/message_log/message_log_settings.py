@@ -27,6 +27,47 @@ class EnumExt(Enum):
         except AttributeError:
             return self.value == other
 
+    # ------------------------------------------------------
+    def succ(self, cycle: bool = False):
+        """Succ."""
+        cls = self.__class__
+        members = list(cls)
+        index = members.index(self) + 1
+
+        if index >= len(members):
+            if cycle:
+                index = 0
+            else:
+                raise StopIteration("end of enumeration reached")
+
+        return members[index]
+
+    # ------------------------------------------------------
+    @property
+    def next(self):
+        """Next."""
+        return self.succ()
+
+    # ------------------------------------------------------
+    def pred(self, cycle: bool = False):
+        """Pred."""
+        cls = self.__class__
+        members = list(cls)
+        index = members.index(self) - 1
+        if index < 0:
+            if cycle:
+                index = len(members) - 1
+            else:
+                raise StopIteration("beginning of enumeration reached")
+
+        return members[index]
+
+    # ------------------------------------------------------
+    @property
+    def prev(self):
+        """Prev."""
+        return self.pred()
+
 
 # ------------------------------------------------------
 # ------------------------------------------------------
@@ -50,6 +91,27 @@ class MessageLevel(EnumExt):
         }
 
         return message_level_to_color___[self.name]
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+class MessageListShow(EnumExt):
+    """Message list show."""
+
+    INFO = 10
+    ATTENTION = 20
+    WARNING = 30
+    ERROR = 40
+    ALL = 100
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+class MessageListOrderBy(EnumExt):
+    """Message list show."""
+
+    ADDED_AT = 10
+    MESSAGE_LEVEL = 20
 
 
 # ------------------------------------------------------
@@ -103,13 +165,19 @@ class MessageLogSettings(SettingsJson):
     """MessageLogSettings."""
 
     # ------------------------------------------------------
-    def __init__(self) -> None:
+    def __init__(self, orderby_message_level: bool = True) -> None:
         """Message log settings."""
 
         super().__init__()
 
         self.highest_message_level: MessageLevel = MessageLevel.INFO
         self.message_list: list[MessageItem] = []
+        self.message_list_show: MessageListShow = MessageListShow.ALL
+        self.message_list_orderby: MessageListOrderBy = (
+            MessageListOrderBy.MESSAGE_LEVEL
+            if orderby_message_level
+            else MessageListOrderBy.ADDED_AT
+        )
 
     # ------------------------------------------------------
     def set_highest_message_level(self) -> None:
@@ -122,13 +190,6 @@ class MessageLogSettings(SettingsJson):
 
                 if self.highest_message_level == MessageLevel.ERROR:
                     break
-            # if item.message_level == MessageLevel.WARNING:
-            #     self.highest_message_level = item.message_level
-            # elif item.message_level == MessageLevel.ATTENTION:
-            #     self.highest_message_level = item.message_level
-            # elif item.message_level == MessageLevel.ERROR:
-            #     self.highest_message_level = item.message_level
-            #     break
 
     # ------------------------------------------------------
     @property

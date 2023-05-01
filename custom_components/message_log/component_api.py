@@ -15,7 +15,13 @@ from .const import (
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
 )
-from .message_log_settings import MessageItem, MessageLevel, MessageLogSettings
+from .message_log_settings import (
+    MessageItem,
+    MessageLevel,
+    MessageListOrderBy,
+    MessageListShow,
+    MessageLogSettings,
+)
 
 
 # ------------------------------------------------------------------
@@ -30,11 +36,13 @@ class ComponentApi:
         self.entry: ConfigEntry = entry
 
         self.coordinator: DataUpdateCoordinator
-        self.scroll_message_pos: int = 0
+        self.scroll_message_pos: int = -1
         self.markdown: str = ""
         self.markdown_message_list: str = ""
         self.message_list_sorted: list[MessageItem] = []
-        self.settings: MessageLogSettings = MessageLogSettings()
+        self.settings: MessageLogSettings = MessageLogSettings(
+            self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
+        )
         self.settings.read_settings(hass.config.path(STORAGE_DIR, DOMAIN))
 
     # ------------------------------------------------------------------
@@ -108,6 +116,41 @@ class ComponentApi:
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
+    async def async_messagelist_orderby_service(self, call: ServiceCall) -> None:
+        """Message list orderby."""
+
+        if call.data.get("orderby") is None:
+            self.settings.message_list_orderby = MessageListOrderBy(
+                self.settings.message_list_orderby.succ(True)
+            )
+        else:
+            self.settings.message_list_orderby = MessageListOrderBy[
+                call.data.get("orderby", "MESSAGE_LEVEL").upper()
+            ]
+
+            if len(self.settings.message_list) > 1:
+                self.scroll_message_pos = -1
+
+        self.settings.write_settings()
+        await self.coordinator.async_refresh()
+
+    # ------------------------------------------------------------------
+    async def async_messagelist_show_service(self, call: ServiceCall) -> None:
+        """Message list show."""
+
+        if call.data.get("show") is None:
+            self.settings.message_list_show = MessageListShow(
+                self.settings.message_list_show.succ(True)
+            )
+        else:
+            self.settings.message_list_orderby = MessageListOrderBy[
+                call.data.get("show", "ALL").upper()
+            ]
+
+        self.settings.write_settings()
+        await self.coordinator.async_refresh()
+
+    # ------------------------------------------------------------------
     async def async_update(self) -> None:
         """Message log Update."""
 
@@ -132,14 +175,44 @@ class ComponentApi:
     # ------------------------------------------------------------------
     def update_markdown(self) -> None:
         """Update markdown."""
-        self.create_sorted_message_list(
-            self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
-        )
-
+        self.create_sorted_message_list(self.settings.message_list_orderby)
         self.create_markdown_latest_and_scroll()
+
+        self.create_sorted_message_list(
+            self.settings.message_list_orderby, self.settings.message_list_show
+        )
         self.create_markdown_message_list()
 
         self.message_list_sorted.clear()
+
+    # ------------------------------------------------------------------
+    def create_markdown_latest_and_scroll(self) -> None:
+        """Markdown latest and scroll."""
+        # Latest message
+        if len(self.settings.message_list) > 0:
+            item: MessageItem = self.settings.message_list[0]
+
+            self.markdown = (
+                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
+                f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
+                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
+            )
+
+            # Scroll message
+            if len(self.message_list_sorted) > 1:
+                while (
+                    self.settings.message_list[0].added_at
+                    == self.message_list_sorted[self.scroll_message_pos].added_at
+                ):
+                    self.update_scroll_message_pos()
+
+                item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
+                self.markdown += (
+                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
+                    f"Modtaget {self.relative_time(item.added_at)}. "
+                )
+        else:
+            self.markdown = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
     # ------------------------------------------------------------------
     def create_markdown_message_list(self) -> None:
@@ -164,46 +237,36 @@ class ComponentApi:
             self.markdown_message_list = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
     # ------------------------------------------------------------------
-    def create_markdown_latest_and_scroll(self) -> None:
-        """Markdown latest and scroll."""
-        # Latest message
-        if len(self.settings.message_list) > 0:
-            item: MessageItem = self.settings.message_list[0]
-
-            self.markdown = (
-                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
-                f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
-                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
-            )
-
-            # Scroll message
-            if len(self.message_list_sorted) > 1:
-                item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
-                self.markdown += (
-                    f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
-                    f"Modtaget {self.relative_time(item.added_at)}. "
-                )
-        else:
-            self.markdown = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
-
-    # ------------------------------------------------------------------
-    def create_sorted_message_list(self, order_by_message_level: bool = True) -> None:
+    def create_sorted_message_list(
+        self,
+        orderby: MessageListOrderBy = MessageListOrderBy.MESSAGE_LEVEL,
+        show: MessageListShow = MessageListShow.ALL,
+    ) -> None:
         """Create sorted message list."""
+        self.message_list_sorted.clear()
 
-        if order_by_message_level:
-            self.message_list_sorted.clear()
-
+        if orderby == MessageListOrderBy.MESSAGE_LEVEL:
             for message_level in reversed(MessageLevel):
                 self.message_list_sorted.extend(
                     [
                         x
                         for x in self.settings.message_list
                         if x.message_level == message_level
+                        and (
+                            show == MessageListShow.ALL
+                            or x.message_level.name == show.name
+                        )
                     ]
                 )
 
         else:
-            self.message_list_sorted = self.settings.message_list
+            self.message_list_sorted.extend(
+                [
+                    x
+                    for x in self.settings.message_list
+                    if show == MessageListShow.ALL or x.message_level.name == show.name
+                ]
+            )
 
     # ------------------------------------------------------------------
     def update_scroll_message_pos(self) -> None:
@@ -216,9 +279,9 @@ class ComponentApi:
             ) or self.scroll_message_pos >= self.entry.options.get(
                 CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5
             ):
-                self.scroll_message_pos = 1
+                self.scroll_message_pos = 0
         else:
-            self.scroll_message_pos = 1
+            self.scroll_message_pos = 0
 
     # ------------------------------------------------------------------
     def get_message(self, num: int = 0) -> str:

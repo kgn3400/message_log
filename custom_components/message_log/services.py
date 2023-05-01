@@ -14,3 +14,9 @@ async def async_setup_services(
     hass.services.async_register(
         DOMAIN, "remove", component_api.async_remove_messages_service
     )
+    hass.services.async_register(
+        DOMAIN, "orderby", component_api.async_messagelist_orderby_service
+    )
+    hass.services.async_register(
+        DOMAIN, "show", component_api.async_messagelist_show_service
+    )
