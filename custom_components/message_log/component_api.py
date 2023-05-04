@@ -39,6 +39,7 @@ class ComponentApi:
         self.scroll_message_pos: int = -1
         self.markdown: str = ""
         self.markdown_message_list: str = ""
+        self.markdown_message_settings: str = ""
         self.message_list_sorted: list[MessageItem] = []
         self.settings: MessageLogSettings = MessageLogSettings(
             self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
@@ -182,6 +183,7 @@ class ComponentApi:
             self.settings.message_list_orderby, self.settings.message_list_show
         )
         self.create_markdown_message_list()
+        self.create_markdown_message_settings()
 
         self.message_list_sorted.clear()
 
@@ -235,6 +237,34 @@ class ComponentApi:
                 count_pos += 1
         else:
             self.markdown_message_list = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
+
+    # ------------------------------------------------------------------
+    def create_markdown_message_settings(self) -> None:
+        """Create markdown for settings."""
+        orderby: str = (
+            "Modtaget"
+            if self.settings.message_list_orderby == MessageListOrderBy.ADDED_AT
+            else "Relevans"
+        )
+
+        match self.settings.message_list_show:
+            case MessageListShow.ALL:
+                show: str = "Alt"
+            case MessageListShow.INFO:
+                show: str = "Info"
+            case MessageListShow.ATTENTION:
+                show: str = "Vigtigt"
+            case MessageListShow.WARNING:
+                show: str = "Advarsel"
+            case MessageListShow.ERROR:
+                show: str = "Fejl"
+
+        self.markdown_message_settings = (
+            "|Opsætning| |\n"
+            "| --- | ----------- |\n"
+            f"| Sortering | : {orderby} |\n"
+            f"| Vis | : {show} |"
+        )
 
     # ------------------------------------------------------------------
     def create_sorted_message_list(

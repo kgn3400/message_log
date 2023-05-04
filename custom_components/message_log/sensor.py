@@ -93,6 +93,10 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         if self.component_api.markdown_message_list:
             attr["markdown_list"] = self.component_api.markdown_message_list
+
+        if self.component_api.markdown_message_settings:
+            attr["markdown_settings"] = self.component_api.markdown_message_settings
+
         return attr
 
     # ------------------------------------------------------
