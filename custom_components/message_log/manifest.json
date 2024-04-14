@@ -8,7 +8,8 @@
   "homekit": {},
   "iot_class": "cloud_push",
   "requirements": ["jsonpickle"],
+  "single_config_entry": true,
   "ssdp": [],
-  "version": "1.0.11",
+  "version": "1.0.12",
   "zeroconf": []
 }

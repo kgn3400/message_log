@@ -1,4 +1,5 @@
 """Base entity for the Message log integration."""
+
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
@@ -29,6 +30,6 @@ class ComponentEntity(CoordinatorEntity[DataUpdateCoordinator], Entity):
             identifiers={(DOMAIN, DOMAIN_NAME)},
             manufacturer="KGN",
             suggested_area="",
-            sw_version="1.0.11",
+            sw_version="1.0.12",
             name=DOMAIN_NAME,
         )

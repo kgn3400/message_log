@@ -1,17 +1,17 @@
 # Service ID
 orderby:
   # Service name as shown in UI
-  name: Order by
+  # name: Order by
   # Description of the service
-  description: Order message list by.
+  # description: Order message list by.
   # Different fields that your service accepts
   fields:
     # Key of the field
     orderby:
       # Field name as shown in UI
-      name: Order by
+      # name: Order by
       # Description of the field
-      description: Order message list by
+      # description: Order message list by
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -27,17 +27,17 @@ orderby:
 # Service ID
 show:
   # Service name as shown in UI
-  name: Show messages
+  # name: Show messages
   # Description of the service
-  description: Messages to show.
+  # description: Messages to show.
   # Different fields that your service accepts
   fields:
     # Key of the field
     show:
       # Field name as shown in UI
-      name: Show messages
+      # name: Show messages
       # Description of the field
-      description: Messages to show
+      # description: Messages to show
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -56,17 +56,17 @@ show:
 # Service ID
 remove:
   # Service name as shown in UI
-  name: Remove messages
+  # name: Remove messages
   # Description of the service
-  description: Remove message from log.
+  # description: Remove message from log.
   # Different fields that your service accepts
   fields:
     # Key of the field
     message_level:
       # Field name as shown in UI
-      name: Message level
+      # name: Message level
       # Description of the field
-      description: Remove specific Message levels
+      # description: Remove specific Message levels
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -92,9 +92,9 @@ add:
     # Key of the field
     message:
       # Field name as shown in UI
-      name: Message
+      # name: Message
       # Description of the field
-      description: Message to log
+      # description: Message to log
       # Whether or not field is required (default = false)
       required: true
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -108,9 +108,9 @@ add:
     # Key of the field
     message_level:
       # Field name as shown in UI
-      name: Message level
+      # name: Message level
       # Description of the field
-      description: Message level
+      # description: Message level
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -129,9 +129,9 @@ add:
     # Key of the field
     icon:
       # Field name as shown in UI
-      name: Icon
+      # name: Icon
       # Description of the field
-      description: Message Icon to display
+      # description: Message Icon to display
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -145,9 +145,9 @@ add:
     # Key of the field
     remove_after:
       # Field name as shown in UI
-      name: Remove after
+      # name: Remove after
       # Description of the field
-      description: Remove message after
+      # description: Remove message after
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -164,9 +164,9 @@ add:
     # Key of the field
     notify:
       # Field name as shown in UI
-      name: Notify
+      # name: Notify
       # Description of the field
-      description: Create a notification
+      # description: Create a notification
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user
@@ -180,9 +180,9 @@ add:
     # Key of the field
     added_at:
       # Field name as shown in UI
-      name: Added at
+      # name: Added at
       # Description of the field
-      description: Added at timestamp
+      # description: Added at timestamp
       # Whether or not field is required (default = false)
       required: false
       # Advanced fields are only shown when the advanced mode is enabled for the user

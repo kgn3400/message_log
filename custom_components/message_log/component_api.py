@@ -66,9 +66,9 @@ class ComponentApi:
         elif diff < timedelta(weeks=1):
             days = diff.days
             return f"for {days} dag{'e' if days != 1 else ''} siden"
-        else:
-            weeks = diff.days // 7
-            return f"for {weeks} uge{'r' if weeks != 1 else ''} siden"
+
+        weeks = diff.days // 7
+        return f"for {weeks} uge{'r' if weeks != 1 else ''} siden"
 
     # ------------------------------------------------------------------
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
@@ -109,7 +109,7 @@ class ComponentApi:
             # Hvorfor er denne bid kun nødvendig i udviklings miløet ??
             # timezonex = pytz.timezone(self.hass.config.time_zone)
             # tmp_off = timezonex.localize(tmp_dict["added_at"]).utcoffset()
-            # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())  # type: ignore
+            # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())
 
         self.settings.message_list.insert(0, MessageItem(**tmp_dict))
         self.settings.set_highest_message_level()

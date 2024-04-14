@@ -1,4 +1,5 @@
 """Sensor for Message log."""
+
 from __future__ import annotations
 
 from homeassistant.components.sensor import (  # SensorDeviceClass,; SensorEntityDescription,
@@ -106,6 +107,7 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         Returns:
             str: Unique  id
+
         """
         return self._unique_id
 
@@ -191,6 +193,7 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
 
         Returns:
             str: Unique  id
+
         """
         return self._unique_id
 
