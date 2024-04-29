@@ -1,16 +1,17 @@
 """Config flow for Pypi updates integration."""
+
 from __future__ import annotations
 
 from typing import Any
 
 import voluptuous as vol
 
-#  from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     IconSelector,
     NumberSelector,
     NumberSelectorConfig,
@@ -19,15 +20,20 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     CONF_DEFAULT_ICON,
+    CONF_LISTEN_TO_TIMER_TRIGGER,
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
     CONF_ORDER_BY_MESSAGE_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
+    CONF_RESTART_TIMER,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
     DOMAIN_NAME,
     LOGGER,
 )
+
+#  from homeassistant import config_entries
+from .fix_entity_selector import EntitySelector, EntitySelectorConfig
 
 
 # ------------------------------------------------------------------
@@ -72,6 +78,16 @@ def _create_form(
                     unit_of_measurement="minutes",
                 )
             ),
+            vol.Optional(
+                CONF_LISTEN_TO_TIMER_TRIGGER,
+                default=user_input.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""),
+            ): EntitySelector(
+                EntitySelectorConfig(integration="timer", multiple=False),
+            ),
+            vol.Optional(
+                CONF_RESTART_TIMER,
+                default=user_input.get(CONF_RESTART_TIMER, False),
+            ): BooleanSelector(),
             vol.Required(
                 CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
                 default=user_input.get(CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5),

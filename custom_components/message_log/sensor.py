@@ -2,17 +2,27 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from homeassistant.components.sensor import (  # SensorDeviceClass,; SensorEntityDescription,
     SensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Event, HomeAssistant
+from homeassistant.helpers import start
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .component_api import ComponentApi
-from .const import DOMAIN
+from .const import (
+    CONF_LISTEN_TO_TIMER_TRIGGER,
+    CONF_RESTART_TIMER,
+    CONF_SCROLL_MESSAGES_EVERY_MINUTES,
+    DOMAIN,
+    RefreshType,
+)
 from .entity import ComponentEntity
+from .timer_trigger import TimerTrigger
 
 
 # ------------------------------------------------------
@@ -27,8 +37,8 @@ async def async_setup_entry(
 
     sensors = []
 
-    sensors.append(MessageLastSensor(coordinator, entry, component_api))
-    sensors.append(MessageScrollSensor(coordinator, entry, component_api))
+    sensors.append(MessageLastSensor(hass, coordinator, entry, component_api))
+    sensors.append(MessageScrollSensor(hass, coordinator, entry, component_api))
 
     async_add_entities(sensors)
 
@@ -41,6 +51,7 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
     # ------------------------------------------------------
     def __init__(
         self,
+        hass: HomeAssistant,
         coordinator: DataUpdateCoordinator,
         entry: ConfigEntry,
         component_api: ComponentApi,
@@ -51,6 +62,8 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         self.component_api = component_api
         self.coordinator = coordinator
+        self.hass: HomeAssistant = hass
+        self.entry: ConfigEntry = entry
 
         self._name = "Last message"
         self._unique_id = "last_message"
@@ -144,6 +157,7 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
     # ------------------------------------------------------
     def __init__(
         self,
+        hass: HomeAssistant,
         coordinator: DataUpdateCoordinator,
         entry: ConfigEntry,
         component_api: ComponentApi,
@@ -152,11 +166,38 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
 
         super().__init__(coordinator, entry)
 
+        self.hass: HomeAssistant = hass
+        self.entry: ConfigEntry = entry
         self.component_api = component_api
         self.coordinator = coordinator
 
+        self.refresh_type: RefreshType = RefreshType.NORMAL
+
         self._name = "Scroll message"
         self._unique_id = "scroll_message"
+
+        if self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""):
+            self.refresh_type = RefreshType.LISTEN_TO_TIMER_TRIGGER
+            self.timer_trigger = TimerTrigger(
+                self,
+                self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""),
+                self.async_handle_timer_finished,
+                self.entry.options.get(CONF_RESTART_TIMER, ""),
+            )
+            self.coordinator.update_interval = None
+
+    # ------------------------------------------------------------------
+    async def async_handle_timer_finished(self, error: bool) -> None:
+        """Handle timer finished."""
+
+        if error:
+            self.refresh_type = RefreshType.NORMAL
+            self.coordinator.update_interval = timedelta(
+                minutes=self.entry.options.get(CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1)
+            )
+
+        if self.refresh_type == RefreshType.LISTEN_TO_TIMER_TRIGGER:
+            await self.coordinator.async_refresh()
 
     # ------------------------------------------------------
     @property
@@ -220,3 +261,22 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
         self.async_on_remove(
             self.coordinator.async_add_listener(self.async_write_ha_state)
         )
+
+        self.async_on_remove(start.async_at_started(self.hass, self.async_hass_started))
+
+    # ------------------------------------------------------
+    async def async_hass_started(self, _event: Event) -> None:
+        """Hass started."""
+
+        if self.refresh_type == RefreshType.NORMAL:
+            self.coordinator.update_interval = timedelta(
+                minutes=self.entry.options.get(CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1)
+            )
+        elif self.refresh_type == RefreshType.LISTEN_TO_TIMER_TRIGGER:
+            if not await self.timer_trigger.async_validate_timer():
+                self.coordinator.update_interval = timedelta(
+                    minutes=self.entry.options.get(
+                        CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1
+                    )
+                )
+                self.refresh_type = RefreshType.NORMAL

@@ -5,7 +5,6 @@
       "name": "Message log"
     }
   },
-
   "config": {
     "abort": {
       "already_configured": "Device is already configured"
@@ -21,7 +20,9 @@
           "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
-          "order_by_message_level": "Order by message level"
+          "order_by_message_level": "Order by message level",
+          "listen_to_timer_trigger": "Use Timer sensor as scroll trigger",
+          "restart_timer": "Restart Timer automatic"
         }
       }
     }
@@ -41,12 +42,19 @@
           "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
-          "order_by_message_level": "Order by message level"
+          "order_by_message_level": "Order by message level",
+          "listen_to_timer_trigger": "Use Timer sensor as scroll trigger",
+          "restart_timer": "Restart Timer automatic"
         }
       }
     }
   },
-
+  "issues": {
+    "missing_timer_entity": {
+      "description": "It looks like either the Timer helper `{entity}` has been deleted or removed for use in Carousel helper `{carousel_helper}`. \n\n Please fix this problem.",
+      "title": "Carousel helper: Timer helper deleted or renamed"
+    }
+  },
   "services": {
     "add": {
       "description": "Add message to log.",
