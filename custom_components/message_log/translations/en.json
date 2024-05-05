@@ -34,10 +34,6 @@
     "error": {
       "unknown": "Unexpected error"
     },
-    "relative_time": {
-      "since": "since"
-    },
-
     "step": {
       "init": {
         "data": {
@@ -48,7 +44,10 @@
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
           "listen_to_timer_trigger": "Use Timer sensor as scroll trigger",
-          "restart_timer": "Restart Timer automatic"
+          "restart_timer": "Restart Timer automatic",
+          "relative_time": {
+            "since": "since"
+          }
         }
       }
     }
