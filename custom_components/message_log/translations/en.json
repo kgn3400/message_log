@@ -34,6 +34,10 @@
     "error": {
       "unknown": "Unexpected error"
     },
+    "relative_time": {
+      "since": "since"
+    },
+
     "step": {
       "init": {
         "data": {
@@ -101,7 +105,7 @@
       "name": "Remove messages",
       "fields": {
         "message_level": {
-          "description": "emove specific Message levels.",
+          "description": "Remove specific Message levels.",
           "name": "Message level"
         }
       }
