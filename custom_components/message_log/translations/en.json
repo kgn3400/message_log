@@ -21,8 +21,8 @@
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
-          "listen_to_timer_trigger": "Use Timer sensor as scroll trigger",
-          "restart_timer": "Restart Timer automatic"
+          "listen_to_timer_trigger": "Use Timer helper as scroll trigger",
+          "restart_timer": "Restart Timer helper automatic"
         }
       }
     }
@@ -34,6 +34,9 @@
     "error": {
       "unknown": "Unexpected error"
     },
+    "relative_time": {
+      "since": "since"
+    },
     "step": {
       "init": {
         "data": {
@@ -43,16 +46,30 @@
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
-          "listen_to_timer_trigger": "Use Timer sensor as scroll trigger",
-          "restart_timer": "Restart Timer automatic"
+          "listen_to_timer_trigger": "Use Timer helper as scroll trigger",
+          "restart_timer": "Restart Timer helper automatic",
+          "rt_received": "Received",
+          "rt_for": "",
+          "rt_ago": "ago",
+          "rt_now": "now",
+          "rt_second": "second",
+          "rt_seconds": "seconds",
+          "rt_minute": "minute",
+          "rt_minutes": "minutes",
+          "rt_hour": "hour",
+          "rt_hours": "hours",
+          "rt_day": "day",
+          "rt_days": "days",
+          "rt_week": "week",
+          "rt_weeks": "weeks"
         }
       }
     }
   },
   "issues": {
     "missing_timer_entity": {
-      "description": "It looks like either the Timer helper `{entity}` has been deleted or removed for use in Carousel helper `{carousel_helper}`. \n\n Please fix this problem.",
-      "title": "Carousel helper: Timer helper deleted or renamed"
+      "description": "It looks like either the Timer helper `{timer_entity}` has been deleted or removed for use in Message log `{entity}`. \n\n Please fix this problem.",
+      "title": "Message log: Timer helper deleted or renamed"
     }
   },
   "services": {

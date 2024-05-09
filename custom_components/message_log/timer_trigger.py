@@ -66,8 +66,8 @@ class TimerTrigger:
                 severity=ir.IssueSeverity.WARNING,
                 translation_key=TRANSLATION_KEY_MISSING__TIMER_ENTITY,
                 translation_placeholders={
-                    "entity": self.timer_entity,
-                    "carousel_helper": self.entity.entity_id,
+                    "timer_entity": self.timer_entity,
+                    "entity": self.entity.entity_id,
                 },
             )
             await self.callback_trigger(True)

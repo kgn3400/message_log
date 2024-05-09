@@ -47,7 +47,7 @@ class ComponentApi:
         self.settings.read_settings(hass.config.path(STORAGE_DIR, DOMAIN))
 
     # ------------------------------------------------------------------
-    def relative_time(self, date_time: datetime) -> str:
+    async def async_relative_time(self, date_time: datetime) -> str:
         """Relative time."""
 
         now = datetime.now()
@@ -157,7 +157,7 @@ class ComponentApi:
 
         self.remove_outdated()
         self.update_scroll_message_pos()
-        self.update_markdown()
+        await self.async_update_markdown()
 
     # ------------------------------------------------------------------
     def remove_outdated(self) -> None:
@@ -174,21 +174,21 @@ class ComponentApi:
             self.settings.write_settings()
 
     # ------------------------------------------------------------------
-    def update_markdown(self) -> None:
+    async def async_update_markdown(self) -> None:
         """Update markdown."""
         self.create_sorted_message_list(self.settings.message_list_orderby)
-        self.create_markdown_latest_and_scroll()
+        await self.async_create_markdown_latest_and_scroll()
 
         self.create_sorted_message_list(
             self.settings.message_list_orderby, self.settings.message_list_show
         )
-        self.create_markdown_message_list()
-        self.create_markdown_message_settings()
+        await self.async_create_markdown_message_list()
+        await self.async_create_markdown_message_settings()
 
         self.message_list_sorted.clear()
 
     # ------------------------------------------------------------------
-    def create_markdown_latest_and_scroll(self) -> None:
+    async def async_create_markdown_latest_and_scroll(self) -> None:
         """Markdown latest and scroll."""
         # Latest message
         if len(self.settings.message_list) > 0:
@@ -197,7 +197,7 @@ class ComponentApi:
             self.markdown = (
                 f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
                 f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>Sidste besked: **{item.message}**</font>\n'
-                f"Modtaget {self.relative_time(item.added_at)}.\n\n"
+                f"Modtaget {await self.async_relative_time(item.added_at)}.\n\n"
             )
 
             # Scroll message
@@ -211,13 +211,13 @@ class ComponentApi:
                 item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
                 self.markdown += (
                     f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> Beskeder: **{item.message}**\n'
-                    f"Modtaget {self.relative_time(item.added_at)}. "
+                    f"Modtaget {await self.async_relative_time(item.added_at)}. "
                 )
         else:
             self.markdown = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
     # ------------------------------------------------------------------
-    def create_markdown_message_list(self) -> None:
+    async def async_create_markdown_message_list(self) -> None:
         """Markdown message list."""
         # Create markdown list
         if len(self.message_list_sorted) > 0:
@@ -232,14 +232,14 @@ class ComponentApi:
 
                 self.markdown_message_list += (
                     f'- <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> **{item.message}**\n'
-                    f"Modtaget {self.relative_time(item.added_at)}.\n"
+                    f"Modtaget {await self.async_relative_time(item.added_at)}.\n"
                 )
                 count_pos += 1
         else:
             self.markdown_message_list = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> Besked\n'
 
     # ------------------------------------------------------------------
-    def create_markdown_message_settings(self) -> None:
+    async def async_create_markdown_message_settings(self) -> None:
         """Create markdown for settings."""
         orderby: str = (
             "Modtaget"
