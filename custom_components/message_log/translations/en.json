@@ -34,9 +34,6 @@
     "error": {
       "unknown": "Unexpected error"
     },
-    "relative_time": {
-      "since": "since"
-    },
     "step": {
       "init": {
         "data": {
