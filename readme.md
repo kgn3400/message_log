@@ -42,7 +42,6 @@ def message_to_hass_log(
     added_at: datetime | None = None,
 ) -> None:
     """Message to hass."""
-    # 2023-04-13 22:00:00
 
     headers = {
         "Authorization": f"Bearer {HASS_TOKEN}",
@@ -64,7 +63,6 @@ def message_to_hass_log(
 
     if added_at:
         data["added_at"] = added_at.strftime("%Y-%m-%d %H:%M:%S")
-        # data["added_at"] = added_at.isoformat()
 
     post(URL, headers=headers, json=data, timeout=3)
 ```
