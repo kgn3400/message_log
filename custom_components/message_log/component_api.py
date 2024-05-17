@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
@@ -13,7 +12,6 @@ from .const import (
     CONF_ORDER_BY_MESSAGE_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
-    DOMAIN,
 )
 from .message_log_settings import (
     MessageItem,
@@ -44,7 +42,6 @@ class ComponentApi:
         self.settings: MessageLogSettings = MessageLogSettings(
             self.entry.options.get(CONF_ORDER_BY_MESSAGE_LEVEL, True)
         )
-        self.settings.read_settings(hass.config.path(STORAGE_DIR, DOMAIN))
 
     # ------------------------------------------------------------------
     async def async_relative_time(self, date_time: datetime) -> str:
@@ -85,7 +82,7 @@ class ComponentApi:
             self.settings.message_list.clear()
 
         self.settings.set_highest_message_level()
-        self.settings.write_settings()
+        await self.settings.async_write_settings()
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
@@ -113,7 +110,7 @@ class ComponentApi:
 
         self.settings.message_list.insert(0, MessageItem(**tmp_dict))
         self.settings.set_highest_message_level()
-        self.settings.write_settings()
+        await self.settings.async_write_settings()
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
@@ -132,7 +129,7 @@ class ComponentApi:
             if len(self.settings.message_list) > 1:
                 self.scroll_message_pos = -1
 
-        self.settings.write_settings()
+        await self.settings.async_write_settings()
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
@@ -148,19 +145,19 @@ class ComponentApi:
                 call.data.get("show", "ALL").upper()
             ]
 
-        self.settings.write_settings()
+        await self.settings.async_write_settings()
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
     async def async_update(self) -> None:
         """Message log Update."""
 
-        self.remove_outdated()
+        await self.async_remove_outdated()
         self.update_scroll_message_pos()
         await self.async_update_markdown()
 
     # ------------------------------------------------------------------
-    def remove_outdated(self) -> None:
+    async def async_remove_outdated(self) -> None:
         """Remove outdated."""
         save_settings: bool = False
 
@@ -171,7 +168,7 @@ class ComponentApi:
 
         if save_settings:
             self.settings.set_highest_message_level()
-            self.settings.write_settings()
+            await self.settings.async_write_settings()
 
     # ------------------------------------------------------------------
     async def async_update_markdown(self) -> None:

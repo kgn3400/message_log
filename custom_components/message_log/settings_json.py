@@ -2,6 +2,7 @@
 
 from os import mkdir, path, remove, sep
 
+import aiofiles
 import jsonpickle
 
 
@@ -34,7 +35,7 @@ class SettingsJson:
             self.settings_file___ = settings_file
 
     # ------------------------------------------------------------------
-    def read_settings(self, settings_file: str = "") -> None:
+    async def async_read_settings(self, settings_file: str = "") -> None:
         """read_settings."""
         if hasattr(self, "__dict__") is False:
             return
@@ -42,8 +43,10 @@ class SettingsJson:
         self.set_settings_file_name(settings_file)
 
         try:
-            with open(self.settings_file___, encoding="UTF-8") as settingsfile:
-                tmp_obj = jsonpickle.decode(settingsfile.read())
+            async with aiofiles.open(
+                self.settings_file___, encoding="UTF-8"
+            ) as settingsfile:
+                tmp_obj = jsonpickle.decode(await settingsfile.read())
 
                 if hasattr(tmp_obj, "__dict__") is False:
                     return
@@ -85,7 +88,7 @@ class SettingsJson:
         return tmp_dict
 
     # ------------------------------------------------------------------
-    def write_settings(
+    async def async_write_settings(
         self, unpicklable: bool = True, write_hidden_attributes: bool = False
     ) -> None:
         """Write settings."""
@@ -96,9 +99,11 @@ class SettingsJson:
         self.write_hidden_attributes___ = write_hidden_attributes
         jsonpickle.set_encoder_options("json", ensure_ascii=False)
 
-        with open(self.settings_file___, "w", encoding="UTF-8") as settingsfile:
-            settingsfile.write(
-                jsonpickle.encode(self, unpicklable=unpicklable, indent=4)  # type: ignore
+        async with aiofiles.open(
+            self.settings_file___, "w", encoding="UTF-8"
+        ) as settingsfile:
+            await settingsfile.write(
+                jsonpickle.encode(self, unpicklable=unpicklable, indent=4)
             )
 
     # ------------------------------------------------------------------
@@ -113,5 +118,4 @@ class SettingsJson:
             except FileNotFoundError:
                 return False
             return True
-        else:
-            return False
+        return False

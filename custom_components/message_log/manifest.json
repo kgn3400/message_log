@@ -10,10 +10,11 @@
   "homekit": {},
   "iot_class": "cloud_push",
   "requirements": [
-    "jsonpickle"
+    "jsonpickle",
+    "aiofiles"
   ],
   "single_config_entry": true,
   "ssdp": [],
-  "version": "1.0.14",
+  "version": "1.0.15",
   "zeroconf": []
 }

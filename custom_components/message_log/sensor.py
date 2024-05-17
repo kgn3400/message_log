@@ -11,6 +11,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant
 from homeassistant.helpers import start
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .component_api import ComponentApi
@@ -34,6 +35,10 @@ async def async_setup_entry(
     """Sensor setup."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     component_api: ComponentApi = hass.data[DOMAIN][entry.entry_id]["component_api"]
+
+    await component_api.settings.async_read_settings(
+        hass.config.path(STORAGE_DIR, DOMAIN)
+    )
 
     sensors = []
 
@@ -110,6 +115,8 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         if self.component_api.markdown_message_settings:
             attr["markdown_settings"] = self.component_api.markdown_message_settings
+
+        # attr["message_list"] = self.component_api.settings.message_list
 
         return attr
 
