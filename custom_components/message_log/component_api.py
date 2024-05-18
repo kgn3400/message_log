@@ -1,7 +1,7 @@
 """Component api."""
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -47,7 +47,7 @@ class ComponentApi:
     async def async_relative_time(self, date_time: datetime) -> str:
         """Relative time."""
 
-        now = datetime.now()
+        now = datetime.now(UTC)
         diff = now - date_time
 
         if diff < timedelta(seconds=10):
@@ -101,7 +101,7 @@ class ComponentApi:
                 tmp_dict["added_at"],
                 # 2023-04-13 22:00:00
                 "%Y-%m-%d %H:%M:%S",
-            )
+            ).astimezone(UTC)
 
             # Hvorfor er denne bid kun nødvendig i udviklings miløet ??
             # timezonex = pytz.timezone(self.hass.config.time_zone)
@@ -162,7 +162,7 @@ class ComponentApi:
         save_settings: bool = False
 
         for index, item in reversed(list(enumerate(self.settings.message_list))):
-            if (item.added_at + item.remove_after) < datetime.now():
+            if (item.added_at + item.remove_after) < datetime.now(UTC):
                 save_settings = True
                 del self.settings.message_list[index]
 

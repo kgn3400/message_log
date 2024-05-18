@@ -23,6 +23,7 @@ from .const import (
     RefreshType,
 )
 from .entity import ComponentEntity
+from .message_log_settings import MessageItemAttr
 from .timer_trigger import TimerTrigger
 
 
@@ -104,6 +105,11 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
         if self.component_api.message_level_last:
             attr["message_level_last"] = self.component_api.message_level_last
 
+        if len(self.component_api.settings.message_list) > 0:
+            attr["message_last_added_at"] = self.component_api.settings.message_list[
+                0
+            ].added_at.isoformat()
+
         if self.component_api.highest_message_level:
             attr["highest__message_level"] = self.component_api.highest_message_level
 
@@ -116,7 +122,17 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
         if self.component_api.markdown_message_settings:
             attr["markdown_settings"] = self.component_api.markdown_message_settings
 
-        # attr["message_list"] = self.component_api.settings.message_list
+        message_list_attr: list[MessageItemAttr] = [
+            MessageItemAttr(
+                item.message,
+                item.message_level,
+                item.icon,
+                item.notify,
+                item.added_at,
+            )
+            for item in self.component_api.settings.message_list
+        ]
+        attr["message_list"] = message_list_attr
 
         return attr
 

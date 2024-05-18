@@ -1,6 +1,7 @@
 """MessageLogSettings."""
+
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from functools import total_ordering
 
@@ -147,9 +148,44 @@ class MessageItem:
         self.notify: bool = notify
 
         if added_at is None:
-            self.added_at: datetime = datetime.now()
+            self.added_at: datetime = datetime.now().astimezone(UTC)
         else:
             self.added_at: datetime = added_at
+
+    # ------------------------------------------------------
+    @property
+    def message_level_color(self) -> str:
+        """Message level color."""
+        return self.message_level.color
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+@dataclass
+class MessageItemAttr:
+    """Message item attribute."""
+
+    # ------------------------------------------------------------------
+
+    def __init__(
+        self,
+        message: str,
+        message_level: MessageLevel = MessageLevel.INFO,
+        icon: str = "mdi:message-badge-outline",
+        notify: bool = False,
+        added_at: datetime | None = None,
+    ) -> None:
+        """Message data."""
+
+        self.message: str = message
+        self.message_level: str = message_level.name.capitalize()
+        self.icon: str = icon
+        self.notify: bool = notify
+
+        if added_at is None:
+            self.added_at: datetime = datetime.now().isoformat()
+        else:
+            self.added_at: datetime = added_at.isoformat()
 
     # ------------------------------------------------------
     @property
