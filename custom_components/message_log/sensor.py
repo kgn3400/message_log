@@ -17,6 +17,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .component_api import ComponentApi
 from .const import (
     CONF_LISTEN_TO_TIMER_TRIGGER,
+    CONF_MARKDOWN_MESSAGE_LIST_COUNT,
     CONF_RESTART_TIMER,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     DOMAIN,
@@ -132,7 +133,9 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
             )
             for item in self.component_api.settings.message_list
         ]
-        attr["message_list"] = message_list_attr
+        attr["message_list"] = message_list_attr[
+            : int(self.entry.options.get(CONF_MARKDOWN_MESSAGE_LIST_COUNT, 10))
+        ]
 
         return attr
 
