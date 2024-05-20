@@ -21,6 +21,7 @@ from .const import (
     CONF_RESTART_TIMER,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     DOMAIN,
+    TRANSLATION_KEY,
     RefreshType,
 )
 from .entity import ComponentEntity
@@ -74,6 +75,7 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
 
         self._name = "Last message"
         self._unique_id = "last_message"
+        self.translation_key = TRANSLATION_KEY
 
     # ------------------------------------------------------
     @property
@@ -201,6 +203,8 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
 
         self._name = "Scroll message"
         self._unique_id = "scroll_message"
+
+        self.translation_key = TRANSLATION_KEY
 
         if self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""):
             self.refresh_type = RefreshType.LISTEN_TO_TIMER_TRIGGER

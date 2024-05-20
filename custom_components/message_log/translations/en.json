@@ -44,7 +44,11 @@
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
           "listen_to_timer_trigger": "Use Timer helper as scroll trigger",
-          "restart_timer": "Restart Timer helper automatic",
+          "restart_timer": "Restart Timer helper automatic"
+        }
+      },
+      "extra": {
+        "data": {
           "rt_received": "Received",
           "rt_for": "",
           "rt_ago": "ago",
@@ -58,7 +62,18 @@
           "rt_day": "day",
           "rt_days": "days",
           "rt_week": "week",
-          "rt_weeks": "weeks"
+          "rt_weeks": "weeks",
+          "message": "Message",
+          "messages": "Messages",
+          "last_message": "Last message",
+          "received": "Received",
+          "relevance": "Relevance",
+          "all": "All",
+          "info": "Info",
+          "attention": "Attention",
+          "warning": "Warning",
+          "error": "Error",
+          "message_settings": "|Setup| |\n| --- | ----------- |\n| Order by | : {orderby} |\n| Show | : {show} |"
         }
       }
     }

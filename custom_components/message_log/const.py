@@ -16,6 +16,10 @@ CONF_ORDER_BY_MESSAGE_LEVEL: str = "order_by_message_level"
 CONF_RESTART_TIMER = "restart_timer"
 CONF_LISTEN_TO_TIMER_TRIGGER = "listen_to_timer_trigger"
 
+TRANSLATION_KEY = DOMAIN
+
+TRANSLATE_EXTRA = "options.step.extra.data"
+
 
 class RefreshType(Enum):
     """Refresh type."""
