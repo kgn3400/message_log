@@ -77,6 +77,9 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
         self._unique_id = "last_message"
         self.translation_key = TRANSLATION_KEY
 
+        # self._attr_has_entity_name = True
+        # self._attr_translation_key = "last_message"
+
     # ------------------------------------------------------
     @property
     def name(self) -> str:
@@ -205,6 +208,9 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
         self._unique_id = "scroll_message"
 
         self.translation_key = TRANSLATION_KEY
+
+        # self._attr_has_entity_name = True
+        # self._attr_translation_key = "scroll_message"
 
         if self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""):
             self.refresh_type = RefreshType.LISTEN_TO_TIMER_TRIGGER

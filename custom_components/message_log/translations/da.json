@@ -1,8 +1,13 @@
 {
-  "title": "Meddelelses log",
+  "title": "Meddelelse log",
   "entity_component": {
     "_": {
-      "name": "Meddelelses log"
+      "name": "Meddelelse log"
+    }
+  },
+  "device": {
+    "message_log": {
+      "name": "Meddelelse log"
     }
   },
   "config": {

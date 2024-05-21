@@ -29,7 +29,8 @@ class ComponentEntity(CoordinatorEntity[DataUpdateCoordinator], Entity):
             entry_type=DeviceEntryType.SERVICE,
             identifiers={(DOMAIN, DOMAIN_NAME)},
             manufacturer="KGN",
+            # translation_key=TRANSLATION_KEY,
             suggested_area="",
-            sw_version="1.0.13",
+            sw_version="1.0.20",
             name=DOMAIN_NAME,
         )

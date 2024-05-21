@@ -5,6 +5,11 @@
       "name": "Message log"
     }
   },
+  "device": {
+    "message_log": {
+      "name": "Message log"
+    }
+  },
   "config": {
     "abort": {
       "already_configured": "Device is already configured"
