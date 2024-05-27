@@ -9,6 +9,7 @@
   "documentation": "https://github.com/kgn3400/message_log",
   "homekit": {},
   "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/kgn3400/message_log/issues",
   "requirements": [
     "jsonpickle",
     "aiofiles"
