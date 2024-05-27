@@ -11,11 +11,12 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/kgn3400/message_log/issues",
   "requirements": [
-    "jsonpickle",
-    "aiofiles"
+    "aiofiles",
+    "orjson",
+    "jsonpickle"
   ],
   "single_config_entry": true,
   "ssdp": [],
-  "version": "1.0.20",
+  "version": "1.0.21",
   "zeroconf": []
 }

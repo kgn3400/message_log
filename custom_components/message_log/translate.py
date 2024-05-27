@@ -1,11 +1,11 @@
 """Hmmm."""
 
-import json
 import os
 import os.path
 from typing import Any
 
 import aiofiles
+import orjson
 
 from homeassistant.components.frontend import storage as frontend_store
 from homeassistant.core import HomeAssistant
@@ -93,9 +93,9 @@ class Translate:
 
             if os.path.isfile(filename):
                 async with aiofiles.open(filename) as json_file:
-                    parsed_json = json.loads(await json_file.read())
-
-                Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
+                    Translate.__json_dict = recursive_flatten(
+                        "", orjson.loads(await json_file.read()), load_only
+                    )
                 return
 
             filename = os.path.join(
@@ -104,8 +104,8 @@ class Translate:
 
             if os.path.isfile(filename):
                 async with aiofiles.open(filename) as json_file:
-                    parsed_json = json.loads(await json_file.read())
-
-                Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
+                    Translate.__json_dict = recursive_flatten(
+                        "", orjson.loads(await json_file.read()), load_only
+                    )
 
                 return
