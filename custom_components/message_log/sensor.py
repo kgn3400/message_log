@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import os
 
 from homeassistant.components.sensor import (  # SensorDeviceClass,; SensorEntityDescription,
     SensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import start
+from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr, start
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -178,6 +179,22 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
         self.async_on_remove(
             self.coordinator.async_add_listener(self.async_write_ha_state)
         )
+
+        self.hass.bus.async_listen(
+            dr.EVENT_DEVICE_REGISTRY_UPDATED,
+            self._handle_device_registry_updated,
+        )
+
+    # ------------------------------------------------------
+    @callback
+    async def _handle_device_registry_updated(
+        self, event: Event[dr.EventDeviceRegistryUpdatedData]
+    ) -> None:
+        """Handle when device registry updated."""
+
+        if event.data["action"] == "remove":
+            if os.path.exists(self.hass.config.path(STORAGE_DIR, DOMAIN)):
+                os.remove(self.hass.config.path(STORAGE_DIR, DOMAIN))
 
 
 # ------------------------------------------------------

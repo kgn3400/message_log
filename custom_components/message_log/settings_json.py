@@ -41,7 +41,7 @@ class SettingsJson:
             return
 
         self.set_settings_file_name(settings_file)
-
+        jsonpickle.set_decoder_options("json")
         try:
             async with aiofiles.open(
                 self.settings_file___, encoding="UTF-8"
@@ -83,7 +83,7 @@ class SettingsJson:
                                     remove_hidden_attrib(item.__dict__)
 
                 remove_hidden_attrib(tmp_dict)
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # noqa: BLE001
                 pass
         return tmp_dict
 

@@ -144,7 +144,7 @@ class MessageItem:
         self.message: str = message
         self.message_level: MessageLevel = tmp_message_level
         self.icon: str = icon
-        self.remove_after: timedelta = timedelta(hours=remove_after)
+        self.remove_after: datetime = datetime.now(UTC) + timedelta(hours=remove_after)
         self.notify: bool = notify
 
         if added_at is None:

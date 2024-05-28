@@ -310,7 +310,7 @@ class ComponentApi:
         save_settings: bool = False
 
         for index, item in reversed(list(enumerate(self.settings.message_list))):
-            if (item.added_at + item.remove_after) < datetime.now(UTC):
+            if item.remove_after < datetime.now(UTC):
                 save_settings = True
                 del self.settings.message_list[index]
 
