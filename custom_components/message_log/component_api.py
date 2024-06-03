@@ -301,7 +301,7 @@ class ComponentApi:
 
         await self.translations.async_refresh()
         await self.async_remove_outdated()
-        self.update_scroll_message_pos()
+        # self.update_scroll_message_pos()
         await self.async_update_markdown()
 
     # ------------------------------------------------------------------
@@ -347,11 +347,7 @@ class ComponentApi:
 
             # Scroll message
             if len(self.message_list_sorted) > 1:
-                while (
-                    self.settings.message_list[0].added_at
-                    == self.message_list_sorted[self.scroll_message_pos].added_at
-                ):
-                    self.update_scroll_message_pos()
+                self.update_scroll_message_pos()
 
                 item: MessageItem = self.message_list_sorted[self.scroll_message_pos]
                 self.markdown += (
@@ -360,6 +356,21 @@ class ComponentApi:
                 )
         else:
             self.markdown = f'## <font color={MessageLevel.INFO.color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> {self.translations.message_str}\n'
+
+    # ------------------------------------------------------------------
+    def update_scroll_message_pos(self) -> None:
+        """Update scroll message pos."""
+        if len(self.message_list_sorted) > 1:
+            self.scroll_message_pos += 1
+
+            if self.scroll_message_pos >= len(
+                self.message_list_sorted
+            ) or self.scroll_message_pos >= self.entry.options.get(
+                CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5
+            ):
+                self.scroll_message_pos = 0
+        else:
+            self.scroll_message_pos = 0
 
     # ------------------------------------------------------------------
     async def async_create_markdown_message_list(self) -> None:
@@ -449,21 +460,6 @@ class ComponentApi:
                     if show == MessageListShow.ALL or x.message_level.name == show.name
                 ]
             )
-
-    # ------------------------------------------------------------------
-    def update_scroll_message_pos(self) -> None:
-        """Update scroll message pos."""
-        if len(self.settings.message_list) > 1:
-            self.scroll_message_pos += 1
-
-            if self.scroll_message_pos >= len(
-                self.settings.message_list
-            ) or self.scroll_message_pos >= self.entry.options.get(
-                CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT, 5
-            ):
-                self.scroll_message_pos = 0
-        else:
-            self.scroll_message_pos = 0
 
     # ------------------------------------------------------------------
     def get_message(self, num: int = 0) -> str:

@@ -41,7 +41,7 @@ class SettingsJson:
             return
 
         self.set_settings_file_name(settings_file)
-        jsonpickle.set_decoder_options("json")
+        # jsonpickle.set_decoder_options("json")
         try:
             async with aiofiles.open(
                 self.settings_file___, encoding="UTF-8"
