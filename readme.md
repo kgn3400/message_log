@@ -6,7 +6,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/kgn3400/message_log)
 [![Validate% with hassfest](https://github.com/kgn3400/message_log/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/kgn3400/message_log/actions/workflows/hassfest.yaml)
 
-The Message log integration allows you to log and view logged messages in Home Assistant from a external system. Message can be created as info, attention, warning or error.
+The Message log integration allows you to log and view logged messages in Home Assistant added from a external system. Message can be created as info, attention, warning or error.
 
 For installation instructions until the Message log integrations is part of HACS, [see this guide](https://hacs.xyz/docs/faq/custom_repositories).
 

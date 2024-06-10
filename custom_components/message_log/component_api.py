@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from functools import partial
+
+from babel.dates import format_timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -38,19 +41,19 @@ class Translations:
 
         self.ago_str: str
 
-        self.seconds_str: str
+        # self.seconds_str: str
 
-        self.minute_str: str
-        self.minutes_str: str
+        # self.minute_str: str
+        # self.minutes_str: str
 
-        self.hour_str: str
-        self.hours_str: str
+        # self.hour_str: str
+        # self.hours_str: str
 
-        self.day_str: str
-        self.days_str: str
+        # self.day_str: str
+        # self.days_str: str
 
-        self.week_str: str
-        self.weeks_str: str
+        # self.week_str: str
+        # self.weeks_str: str
 
         self.message_str: str
         self.messages_str: str
@@ -83,37 +86,37 @@ class Translations:
             TRANSLATE_EXTRA + ".rt_ago",
         )
 
-        self.seconds_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_seconds",
-        )
+        # self.seconds_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_seconds",
+        # )
 
-        self.minute_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_minute",
-        )
-        self.minutes_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_minutes",
-        )
+        # self.minute_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_minute",
+        # )
+        # self.minutes_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_minutes",
+        # )
 
-        self.hour_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_hour",
-        )
-        self.hours_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_hours",
-        )
+        # self.hour_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_hour",
+        # )
+        # self.hours_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_hours",
+        # )
 
-        self.day_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_day",
-        )
-        self.days_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_days",
-        )
+        # self.day_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_day",
+        # )
+        # self.days_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_days",
+        # )
 
-        self.week_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_week",
-        )
-        self.weeks_str = await self.translate.async_get_localized_str(
-            TRANSLATE_EXTRA + ".rt_weeks",
-        )
+        # self.week_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_week",
+        # )
+        # self.weeks_str = await self.translate.async_get_localized_str(
+        #     TRANSLATE_EXTRA + ".rt_weeks",
+        # )
 
         self.message_str = await self.translate.async_get_localized_str(
             TRANSLATE_EXTRA + ".message",
@@ -190,29 +193,40 @@ class ComponentApi:
         """Relative time."""
 
         now = datetime.now(UTC)
-        diff: timedelta = now - date_time
+        diff: timedelta = date_time - now
+        # diff: timedelta = now - date_time
+
+        diff_str: str = await self.hass.async_add_executor_job(
+            partial(
+                format_timedelta,
+                delta=diff,
+                add_direction=True,
+                locale=self.translate.acive_language,
+            )
+        )
+        return diff_str
 
         # -----------------------------
-        if diff < timedelta(seconds=6):
-            return self.translations.now_str
+        # if diff < timedelta(seconds=6):
+        #     return self.translations.now_str
 
-        elif diff < timedelta(minutes=1):
-            return f"{self.translations.for_str} {diff.seconds} {self.translations.seconds_str} {self.translations.ago_str}"
+        # elif diff < timedelta(minutes=1):
+        #     return f"{self.translations.for_str} {diff.seconds} {self.translations.seconds_str} {self.translations.ago_str}"
 
-        elif diff < timedelta(hours=1):
-            minutes: int = diff.seconds // 60
-            return f"{self.translations.for_str} {minutes} {self.translations.minutes_str if minutes != 1 else self.translations.minute_str} {self.translations.ago_str}"
+        # elif diff < timedelta(hours=1):
+        #     minutes: int = diff.seconds // 60
+        #     return f"{self.translations.for_str} {minutes} {self.translations.minutes_str if minutes != 1 else self.translations.minute_str} {self.translations.ago_str}"
 
-        elif diff < timedelta(days=1):
-            hours: int = diff.seconds // 3600
-            return f"{self.translations.for_str} {hours} {self.translations.hours_str if hours != 1 else self.translations.hour_str} {self.translations.ago_str}"
+        # elif diff < timedelta(days=1):
+        #     hours: int = diff.seconds // 3600
+        #     return f"{self.translations.for_str} {hours} {self.translations.hours_str if hours != 1 else self.translations.hour_str} {self.translations.ago_str}"
 
-        elif diff < timedelta(weeks=1):
-            days: int = diff.days
-            return f"{self.translations.for_str} {days} {self.translations.days_str if days != 1 else self.translations.day_str} {self.translations.ago_str}"
+        # elif diff < timedelta(weeks=1):
+        #     days: int = diff.days
+        #     return f"{self.translations.for_str} {days} {self.translations.days_str if days != 1 else self.translations.day_str} {self.translations.ago_str}"
 
-        weeks: int = diff.days // 7
-        return f"{self.translations.for_str} {weeks} {self.translations.weeks_str if weeks != 1 else self.translations.week_str} {self.translations.ago_str}"
+        # weeks: int = diff.days // 7
+        # return f"{self.translations.for_str} {weeks} {self.translations.weeks_str if weeks != 1 else self.translations.week_str} {self.translations.ago_str}"
 
     # ------------------------------------------------------------------
     async def async_remove_messages_service(self, call: ServiceCall) -> None:

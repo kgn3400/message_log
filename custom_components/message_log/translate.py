@@ -18,6 +18,7 @@ class Translate:
 
     __language: str = ""
     __json_dict: dict[str, Any] = {}
+    acive_language: str = ""
 
     def __init__(self, hass: HomeAssistant, load_only: str = "") -> None:
         """Init."""
@@ -96,6 +97,7 @@ class Translate:
                     Translate.__json_dict = recursive_flatten(
                         "", orjson.loads(await json_file.read()), load_only
                     )
+                Translate.acive_language = language
                 return
 
             filename = os.path.join(
@@ -107,5 +109,5 @@ class Translate:
                     Translate.__json_dict = recursive_flatten(
                         "", orjson.loads(await json_file.read()), load_only
                     )
-
+                Translate.acive_language = "en"
                 return

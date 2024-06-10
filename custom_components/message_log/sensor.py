@@ -184,6 +184,7 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
             dr.EVENT_DEVICE_REGISTRY_UPDATED,
             self._handle_device_registry_updated,
         )
+        await self.coordinator.async_request_refresh()
 
     # ------------------------------------------------------
     @callback

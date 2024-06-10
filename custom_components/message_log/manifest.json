@@ -13,10 +13,11 @@
   "requirements": [
     "aiofiles",
     "orjson",
-    "jsonpickle"
+    "jsonpickle",
+    "babel"
   ],
   "single_config_entry": true,
   "ssdp": [],
-  "version": "1.0.23",
+  "version": "1.0.24",
   "zeroconf": []
 }

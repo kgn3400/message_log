@@ -31,6 +31,6 @@ class ComponentEntity(CoordinatorEntity[DataUpdateCoordinator], Entity):
             manufacturer="KGN",
             # translation_key=TRANSLATION_KEY,
             suggested_area="",
-            sw_version="1.0.23",
+            sw_version="1.0.24",
             name=DOMAIN_NAME,
         )
