@@ -2,18 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Any, cast
+from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.schema_config_entry_flow import (
-    SchemaConfigFlowHandler,
-    SchemaFlowFormStep,
-    SchemaFlowMenuStep,
-)
 from homeassistant.helpers.selector import (
     BooleanSelector,
     IconSelector,
@@ -33,6 +29,7 @@ from .const import (
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
     DOMAIN_NAME,
+    LOGGER,
 )
 
 #  from homeassistant import config_entries
@@ -125,100 +122,88 @@ def _create_form(
     )
 
 
-CONFIG_OPTIONS = {
-    vol.Required(
-        CONF_REMOVE_MESSAGE_AFTER_HOURS,
-        default=24,
-    ): NumberSelector(
-        NumberSelectorConfig(
-            min=1,
-            max=696,
-            mode=NumberSelectorMode.BOX,
-            unit_of_measurement="hours",
-        )
-    ),
-    vol.Required(
-        CONF_SCROLL_MESSAGES_EVERY_MINUTES,
-        default=0.5,
-    ): NumberSelector(
-        NumberSelectorConfig(
-            min=0.5,
-            max=696,
-            step=1,
-            mode=NumberSelectorMode.BOX,
-            unit_of_measurement="minutes",
-        )
-    ),
-    vol.Optional(
-        CONF_LISTEN_TO_TIMER_TRIGGER,
-    ): EntitySelector(
-        EntitySelectorConfig(integration="timer", multiple=False),
-    ),
-    vol.Optional(
-        CONF_RESTART_TIMER,
-        default=False,
-    ): BooleanSelector(),
-    vol.Required(
-        CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
-        default=5,
-    ): NumberSelector(
-        NumberSelectorConfig(
-            min=1,
-            max=696,
-            mode=NumberSelectorMode.BOX,
-            unit_of_measurement="count",
-        )
-    ),
-    vol.Required(
-        CONF_MARKDOWN_MESSAGE_LIST_COUNT,
-        default=10,
-    ): NumberSelector(
-        NumberSelectorConfig(
-            min=2,
-            max=100,
-            mode=NumberSelectorMode.BOX,
-            unit_of_measurement="count",
-        )
-    ),
-    vol.Required(
-        CONF_DEFAULT_ICON,
-        default="mdi:message-badge-outline",
-    ): IconSelector(),
-    vol.Required(
-        CONF_ORDER_BY_MESSAGE_LEVEL,
-        default=True,
-    ): cv.boolean,
-}
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Pypi updates."""
 
-CONFIG_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
-    "user": SchemaFlowFormStep(
-        vol.Schema(
-            {
-                **CONFIG_OPTIONS,
-            }
-        ),
-    ),
-}
-OPTIONS_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
-    "init": SchemaFlowFormStep(
-        vol.Schema(
-            {
-                **CONFIG_OPTIONS,
-            }
-        ),
-    ),
-}
+    VERSION = 1
+
+    # ------------------------------------------------------------------
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the initial step."""
+        errors: dict[str, str] = {}
+
+        await self.async_set_unique_id(DOMAIN)
+        self._abort_if_unique_id_configured()
+
+        if user_input is not None:
+            try:
+                if await _validate_input(self.hass, user_input, errors):
+                    return self.async_create_entry(
+                        title=DOMAIN_NAME, data=user_input, options=user_input
+                    )
+
+            except Exception:  # noqa: BLE001
+                LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+        else:
+            user_input = {}
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=_create_form(user_input),
+            errors=errors,
+        )
+
+    # ------------------------------------------------------------------
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: ConfigEntry,
+    ) -> OptionsFlow:
+        """Get the options flow."""
+        return OptionsFlowHandler(config_entry)
 
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
-class ConfigFlowHandler(SchemaConfigFlowHandler, domain=DOMAIN):
-    """Handle a config or options flow."""
+class OptionsFlowHandler(OptionsFlow):
+    """Options flow for Pypi updates."""
 
-    config_flow = CONFIG_FLOW
-    options_flow = OPTIONS_FLOW
+    def __init__(
+        self,
+        config_entry: ConfigEntry,
+    ) -> None:
+        """Initialize options flow."""
 
-    def async_config_entry_title(self, options: Mapping[str, Any]) -> str:
-        """Return config entry title."""
+        self.config_entry = config_entry
 
-        return cast(str, DOMAIN_NAME)
+        # self._selection: dict[str, Any] = {}
+        # self._configs: dict[str, Any] = self.config_entry.data.copy()
+        self._options: dict[str, Any] = self.config_entry.options.copy()
+
+    # ------------------------------------------------------------------
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the initial step."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                if await _validate_input(self.hass, user_input, errors):
+                    return self.async_create_entry(title=DOMAIN_NAME, data=user_input)
+            except Exception:  # noqa: BLE001
+                LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+        else:
+            user_input = self._options.copy()
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=_create_form(user_input),
+            errors=errors,
+        )
