@@ -1,4 +1,5 @@
 """The Messages log integration."""
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -10,7 +11,6 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .component_api import ComponentApi
 from .const import CONF_SCROLL_MESSAGES_EVERY_MINUTES, DOMAIN, LOGGER
-from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
@@ -47,8 +47,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    await async_setup_services(hass, component_api)
-
     return True
 
 
@@ -81,4 +79,3 @@ async def update_listener(
 
     await hass.config_entries.async_reload(config_entry.entry_id)
     await component_api.async_update()
-

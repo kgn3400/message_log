@@ -15,6 +15,7 @@ from .const import (
     CONF_ORDER_BY_MESSAGE_LEVEL,
     CONF_REMOVE_MESSAGE_AFTER_HOURS,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
+    DOMAIN,
     TRANSLATE_EXTRA,
 )
 from .message_log_settings import (
@@ -40,20 +41,6 @@ class Translations:
         self.for_str: str
 
         self.ago_str: str
-
-        # self.seconds_str: str
-
-        # self.minute_str: str
-        # self.minutes_str: str
-
-        # self.hour_str: str
-        # self.hours_str: str
-
-        # self.day_str: str
-        # self.days_str: str
-
-        # self.week_str: str
-        # self.weeks_str: str
 
         self.message_str: str
         self.messages_str: str
@@ -85,38 +72,6 @@ class Translations:
         self.ago_str = await self.translate.async_get_localized_str(
             TRANSLATE_EXTRA + ".rt_ago",
         )
-
-        # self.seconds_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_seconds",
-        # )
-
-        # self.minute_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_minute",
-        # )
-        # self.minutes_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_minutes",
-        # )
-
-        # self.hour_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_hour",
-        # )
-        # self.hours_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_hours",
-        # )
-
-        # self.day_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_day",
-        # )
-        # self.days_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_days",
-        # )
-
-        # self.week_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_week",
-        # )
-        # self.weeks_str = await self.translate.async_get_localized_str(
-        #     TRANSLATE_EXTRA + ".rt_weeks",
-        # )
 
         self.message_str = await self.translate.async_get_localized_str(
             TRANSLATE_EXTRA + ".message",
@@ -177,6 +132,28 @@ class ComponentApi:
 
         self.translate: Translate = Translate(hass, TRANSLATE_EXTRA)
         self.translations: Translations = Translations(hass)
+
+        """Set up the actions for the Message log integration."""
+        hass.services.async_register(
+            DOMAIN,
+            "add",
+            self.async_add_message_service,
+        )
+        hass.services.async_register(
+            DOMAIN,
+            "remove",
+            self.async_remove_messages_service,
+        )
+        hass.services.async_register(
+            DOMAIN,
+            "orderby",
+            self.async_messagelist_orderby_service,
+        )
+        hass.services.async_register(
+            DOMAIN,
+            "show",
+            self.async_messagelist_show_service,
+        )
 
     # ------------------------------------------------------------------
     async def async_relative_time_received(self, date_time: datetime) -> str:
