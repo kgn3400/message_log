@@ -188,7 +188,7 @@ class MessageLastSensor(ComponentEntity, SensorEntity):
         """Handle when device registry updated."""
 
         if event.data["action"] == "remove":
-            self.component_api.settings.async_remove_settings()
+            await self.component_api.settings.async_remove_settings()
 
 
 # ------------------------------------------------------
