@@ -12,7 +12,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .component_api import ComponentApi
 from .const import DOMAIN, LOGGER
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.NOTIFY]
 
 
 # ------------------------------------------------------------------
