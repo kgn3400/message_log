@@ -22,11 +22,11 @@
         "data": {
           "remove_message_after_hours": "Remove message after",
           "default_icon": "default message icon",
-          "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
-          "listen_to_timer_trigger": "Use Timer helper as scroll trigger",
+          "scroll_messages_every_minutes": "scroll messages every",
+          "listen_to_timer_trigger": "Or use a Timer helper as scroll trigger",
           "restart_timer": "Restart Timer helper automatic"
         }
       }
@@ -44,11 +44,11 @@
         "data": {
           "remove_message_after_hours": "Remove message after",
           "default_icon": "default message icon",
-          "scroll_messages_every_minutes": "scroll messages every",
           "scroll_through_last_messages_count": "Scroll through last messages",
           "markdown_message_list_count": "Markdown message list count",
           "order_by_message_level": "Order by message level",
-          "listen_to_timer_trigger": "Use Timer helper as scroll trigger",
+          "scroll_messages_every_minutes": "scroll messages every",
+          "listen_to_timer_trigger": "Or use a Timer helper as scroll trigger",
           "restart_timer": "Restart Timer helper automatic"
         }
       },

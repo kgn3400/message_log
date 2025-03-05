@@ -1,6 +1,5 @@
 """Constants for Message log integration."""
 
-from enum import Enum
 from logging import Logger, getLogger
 
 DOMAIN = "message_log"
@@ -21,10 +20,3 @@ TRANSLATE_EXTRA = "options.step.extra.data"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN
-
-
-class RefreshType(Enum):
-    """Refresh type."""
-
-    NORMAL = 1
-    LISTEN_TO_TIMER_TRIGGER = 2

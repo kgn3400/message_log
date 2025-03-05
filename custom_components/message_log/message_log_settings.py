@@ -7,6 +7,7 @@ from functools import total_ordering
 
 from homeassistant.core import HomeAssistant
 
+from .const import STORAGE_KEY, STORAGE_VERSION
 from .storage_json import StorageJson
 
 
@@ -206,7 +207,7 @@ class MessageLogSettings(StorageJson):
     def __init__(self, hass: HomeAssistant, orderby_message_level: bool = True) -> None:
         """Message log settings."""
 
-        super().__init__(hass)
+        super().__init__(hass, STORAGE_KEY, STORAGE_VERSION)
 
         self.highest_message_level: MessageLevel = MessageLevel.INFO
         self.message_list: list[MessageItem] = []

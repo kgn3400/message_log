@@ -17,7 +17,6 @@ from .const import (
     CONF_RESTART_TIMER,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     TRANSLATION_KEY,
-    RefreshType,
 )
 from .entity import ComponentEntity
 from .message_log_settings import MessageItemAttr
@@ -200,35 +199,29 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
         self.entry: CommonConfigEntry = entry
         self.component_api: ComponentApi = entry.runtime_data.component_api
 
-        self.refresh_type: RefreshType = RefreshType.NORMAL
+        # self.refresh_type: RefreshType = RefreshType.NORMAL
 
         self._name = "Scroll message"
         self._unique_id = "scroll_message"
 
         self.translation_key = TRANSLATION_KEY
 
-        if self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""):
-            self.refresh_type = RefreshType.LISTEN_TO_TIMER_TRIGGER
-            self.timer_trigger = TimerTrigger(
-                self,
-                self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""),
-                self.async_handle_timer_finished,
-                self.entry.options.get(CONF_RESTART_TIMER, ""),
-            )
-            self.coordinator.update_interval = None
+        self.timer_trigger = TimerTrigger(
+            self,
+            timer_entity=self.entry.options.get(CONF_LISTEN_TO_TIMER_TRIGGER, ""),
+            duration=timedelta(
+                minutes=self.entry.options.get(CONF_SCROLL_MESSAGES_EVERY_MINUTES, 0.5)
+            ),
+            callback_trigger=self.async_handle_timer_finished,
+            auto_restart=self.entry.options.get(CONF_RESTART_TIMER, ""),
+        )
+        self.coordinator.update_interval = None
 
     # ------------------------------------------------------------------
     async def async_handle_timer_finished(self, error: bool) -> None:
         """Handle timer finished."""
 
-        if error:
-            self.refresh_type = RefreshType.NORMAL
-            self.coordinator.update_interval = timedelta(
-                minutes=self.entry.options.get(CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1)
-            )
-
-        if self.refresh_type == RefreshType.LISTEN_TO_TIMER_TRIGGER:
-            await self.coordinator.async_refresh()
+        await self.coordinator.async_refresh()
 
     # ------------------------------------------------------
     @property
@@ -298,16 +291,3 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
     # ------------------------------------------------------
     async def async_hass_started(self, _event: Event) -> None:
         """Hass started."""
-
-        if self.refresh_type == RefreshType.NORMAL:
-            self.coordinator.update_interval = timedelta(
-                minutes=self.entry.options.get(CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1)
-            )
-        elif self.refresh_type == RefreshType.LISTEN_TO_TIMER_TRIGGER:
-            if not await self.timer_trigger.async_validate_timer():
-                self.coordinator.update_interval = timedelta(
-                    minutes=self.entry.options.get(
-                        CONF_SCROLL_MESSAGES_EVERY_MINUTES, 1
-                    )
-                )
-                self.refresh_type = RefreshType.NORMAL

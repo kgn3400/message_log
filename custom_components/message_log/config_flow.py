@@ -67,7 +67,7 @@ CONFIG_OPTIONS = {
     ),
     vol.Optional(
         CONF_RESTART_TIMER,
-        default=False,
+        default=True,
     ): BooleanSelector(),
     vol.Required(
         CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,

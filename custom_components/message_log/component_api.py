@@ -238,10 +238,6 @@ class ComponentApi:
             # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())
 
         await self.async_add_message(MessageItem(**tmp_dict))
-        # self.settings.message_list.insert(0, MessageItem(**tmp_dict))
-        # self.settings.set_highest_message_level()
-        # await self.settings.async_write_settings()
-        # await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
     async def async_add_message(self, message_item: MessageItem) -> None:
