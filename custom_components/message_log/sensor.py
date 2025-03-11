@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import Event, HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr, start
+from homeassistant.helpers import device_registry as dr, issue_registry as ir, start
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import CommonConfigEntry
@@ -16,11 +16,14 @@ from .const import (
     CONF_MARKDOWN_MESSAGE_LIST_COUNT,
     CONF_RESTART_TIMER,
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
+    DOMAIN,
+    DOMAIN_NAME,
     TRANSLATION_KEY,
+    TRANSLATION_KEY_MISSING_TIMER_ENTITY,
 )
 from .entity import ComponentEntity
 from .message_log_settings import MessageItemAttr
-from .timer_trigger import TimerTrigger
+from .timer_trigger import TimerTrigger, TimerTriggerErrorEnum
 
 
 # ------------------------------------------------------
@@ -218,8 +221,30 @@ class MessageScrollSensor(ComponentEntity, SensorEntity):
         self.coordinator.update_interval = None
 
     # ------------------------------------------------------------------
-    async def async_handle_timer_finished(self, error: bool) -> None:
+    async def async_handle_timer_finished(self, error: TimerTriggerErrorEnum) -> None:
         """Handle timer finished."""
+
+        if error:
+            match error:
+                case TimerTriggerErrorEnum.MISSING_TIMER_ENTITY:
+                    ir.async_create_issue(
+                        self.hass,
+                        DOMAIN,
+                        DOMAIN_NAME + datetime.now().isoformat(),
+                        issue_domain=DOMAIN,
+                        is_fixable=False,
+                        severity=ir.IssueSeverity.WARNING,
+                        translation_key=TRANSLATION_KEY_MISSING_TIMER_ENTITY,
+                        translation_placeholders={
+                            "timer_entity": self.entry.options.get(
+                                CONF_LISTEN_TO_TIMER_TRIGGER, ""
+                            ),
+                            "entity": self.entity_id,
+                        },
+                    )
+                case _:
+                    pass
+            return
 
         await self.coordinator.async_refresh()
 

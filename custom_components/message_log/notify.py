@@ -7,7 +7,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from . import CommonConfigEntry
-from .const import DOMAIN_NAME
+from .const import DOMAIN, DOMAIN_NAME
 from .entity import ComponentEntity
 from .message_log_settings import MessageItem
 
@@ -42,7 +42,8 @@ class MessageLogNotifyEntity(ComponentEntity, NotifyEntity):
         self.coordinator: DataUpdateCoordinator = entry.runtime_data.coordinator
         self._attr_unique_id = DOMAIN_NAME
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN_NAME, DOMAIN_NAME)},
+            identifiers={(DOMAIN, entry.entry_id)},
+            manufacturer="KGN",
             name=DOMAIN_NAME + " Notifier",
         )
 

@@ -17,6 +17,7 @@ CONF_LISTEN_TO_TIMER_TRIGGER = "listen_to_timer_trigger"
 
 TRANSLATION_KEY = DOMAIN
 TRANSLATE_EXTRA = "options.step.extra.data"
+TRANSLATION_KEY_MISSING_TIMER_ENTITY = "missing_timer_entity"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN
