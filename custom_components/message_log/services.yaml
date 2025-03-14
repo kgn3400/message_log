@@ -191,3 +191,17 @@ add:
       default: "2023-04-18 22:00:00"
       selector:
         datetime:
+    source:
+      # Field name as shown in UI
+      # name: Message
+      # Description of the field
+      # description: Message to log
+      # Whether or not field is required (default = false)
+      required: false
+      # Advanced fields are only shown when the advanced mode is enabled for the user
+      # (default = false)
+      example: service"
+      # The default field value
+      default: "service"
+      selector:
+        text:

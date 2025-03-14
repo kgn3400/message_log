@@ -17,6 +17,9 @@ from .const import (
     CONF_SCROLL_MESSAGES_EVERY_MINUTES,
     CONF_SCROLL_THROUGH_LAST_MESSAGES_COUNT,
     DOMAIN,
+    EVENT_NEW_LOG_ENTRY,
+    EVENT_NEW_NOTIFY_LOG_ENTRY,
+    SOURCE_SERVICE,
     TRANSLATE_EXTRA,
 )
 from .message_log_settings import (
@@ -232,10 +235,8 @@ class ComponentApi:
                 "%Y-%m-%d %H:%M:%S",
             ).astimezone(UTC)
 
-            # Hvorfor er denne bid kun nødvendig i udviklings miløet ??
-            # timezonex = pytz.timezone(self.hass.config.time_zone)
-            # tmp_off = timezonex.localize(tmp_dict["added_at"]).utcoffset()
-            # tmp_dict["added_at"] -= timedelta(seconds=tmp_off.total_seconds())
+        if tmp_dict.get("source", "") == "":
+            tmp_dict["source"] = SOURCE_SERVICE
 
         await self.async_add_message(MessageItem(**tmp_dict))
 
@@ -245,7 +246,41 @@ class ComponentApi:
         self.settings.message_list.insert(0, message_item)
         self.settings.set_highest_message_level()
         await self.settings.async_write_settings()
+        await self.async_fire_events(message_item)
         await self.coordinator.async_refresh()
+
+    # ------------------------------------------------------------------
+    async def async_fire_events(self, message_item: MessageItem) -> None:
+        """Fire events."""
+
+        self.hass.bus.async_fire(
+            DOMAIN + "." + EVENT_NEW_LOG_ENTRY,
+            {
+                "message": message_item.message,
+                "message_level": message_item.message_level.name.capitalize(),
+            },
+        )
+
+        self.hass.bus.async_fire(
+            DOMAIN
+            + "."
+            + EVENT_NEW_LOG_ENTRY
+            + "_"
+            + message_item.message_level.name.lower(),
+            {
+                "message": message_item.message,
+                "message_level": message_item.message_level.name.capitalize(),
+            },
+        )
+
+        if message_item.notify:
+            self.hass.bus.async_fire(
+                DOMAIN + "." + EVENT_NEW_NOTIFY_LOG_ENTRY,
+                {
+                    "message": message_item.message,
+                    "message_level": message_item.message_level.name.capitalize(),
+                },
+            )
 
     # ------------------------------------------------------------------
     async def async_messagelist_orderby_service(self, call: ServiceCall) -> None:
@@ -327,7 +362,7 @@ class ComponentApi:
             item: MessageItem = self.settings.message_list[0]
 
             self.markdown = (
-                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> { self.translations.message_str}\n'
+                f'## <font color={self.settings.highest_message_level_color}>  <ha-icon icon="mdi:message-outline"></ha-icon></font> {self.translations.message_str}\n'
                 f'-  <font color={item.message_level_color}>  <ha-icon icon="{item.icon}"></ha-icon></font> <font size=3>{self.translations.last_message_str}: **{item.message}**</font>\n'
                 f"{await self.async_relative_time_received(item.added_at)}.\n\n"
             )

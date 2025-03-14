@@ -107,6 +107,10 @@
         "added_at": {
           "description": "Added at timestamp.",
           "name": "Added at"
+        },
+        "source": {
+          "description": "Source.",
+          "name": "Source"
         }
       }
     },
@@ -139,6 +143,16 @@
           "name": "Show messages"
         }
       }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "new_log_entry": "New log entry",
+      "new_log_entry_info": "New info log entry",
+      "new_log_entry_warning": "New warning log entry",
+      "new_log_entry_attention": "New attention log entry",
+      "new_log_entry_error": "New error log entry",
+      "new_notify_log_entry": "New notify log entry"
     }
   }
 }

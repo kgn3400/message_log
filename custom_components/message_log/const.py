@@ -21,3 +21,9 @@ TRANSLATION_KEY_MISSING_TIMER_ENTITY = "missing_timer_entity"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN
+
+EVENT_NEW_LOG_ENTRY = "new_log_entry"
+EVENT_NEW_NOTIFY_LOG_ENTRY = "new_notify_log_entry"
+
+SOURCE_NOTIFY = "Notify"
+SOURCE_SERVICE = "Service"

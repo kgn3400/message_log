@@ -107,6 +107,10 @@
         "added_at": {
           "description": "Tilføjet på tidsstempel.",
           "name": "Tilføjet klokken"
+        },
+        "source": {
+          "description": "Kilde.",
+          "name": "Kilde"
         }
       }
     },
@@ -139,6 +143,16 @@
           "name": "Vis meddelelse"
         }
       }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "new_log_entry": "Ny log registrering",
+      "new_log_entry_info": "Ny info log registrering",
+      "new_log_entry_warning": "Ny advarsel log registrering",
+      "new_log_entry_attention": "Ny opmærksomhed log registrering",
+      "new_log_entry_error": "Ny fejl log registrering",
+      "new_notify_log_entry": "Ny log registrering notifikation"
     }
   }
 }

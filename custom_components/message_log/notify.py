@@ -7,7 +7,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from . import CommonConfigEntry
-from .const import DOMAIN, DOMAIN_NAME
+from .const import DOMAIN, DOMAIN_NAME, SOURCE_NOTIFY
 from .entity import ComponentEntity
 from .message_log_settings import MessageItem
 
@@ -50,5 +50,5 @@ class MessageLogNotifyEntity(ComponentEntity, NotifyEntity):
     async def async_send_message(self, message: str, title: str | None = None) -> None:
         """Send a message."""
         await self.entry.runtime_data.component_api.async_add_message(
-            MessageItem(message)
+            MessageItem(message, source=SOURCE_NOTIFY)
         )

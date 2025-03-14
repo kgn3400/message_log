@@ -134,6 +134,7 @@ class MessageItem:
         remove_after: float = 24,
         notify: bool = False,
         added_at: datetime | None = None,
+        source: str = "",
     ) -> None:
         """Message data."""
         tmp_message_level: MessageLevel = MessageLevel.INFO
@@ -154,6 +155,8 @@ class MessageItem:
             self.added_at: datetime = datetime.now().astimezone(UTC)
         else:
             self.added_at: datetime = added_at
+
+        self.source: str = source
 
     # ------------------------------------------------------
     @property
@@ -177,6 +180,7 @@ class MessageItemAttr:
         icon: str = "mdi:message-badge-outline",
         notify: bool = False,
         added_at: datetime | None = None,
+        source: str = "",
     ) -> None:
         """Message data."""
 
@@ -189,6 +193,8 @@ class MessageItemAttr:
             self.added_at: datetime = datetime.now().isoformat()
         else:
             self.added_at: datetime = added_at.isoformat()
+
+        self.source: str = source
 
     # ------------------------------------------------------
     @property
