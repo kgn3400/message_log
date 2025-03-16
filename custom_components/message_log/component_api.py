@@ -519,6 +519,16 @@ class ComponentApi:
 
     # ------------------------------------------------------------------
     @property
+    def message_source_last(self) -> str:
+        """Message sorce last."""
+        return (
+            self.settings.message_list[0].source.capitalize()
+            if len(self.settings.message_list) > 0
+            else ""
+        )
+
+    # ------------------------------------------------------------------
+    @property
     def message_level_color_last(self) -> str:
         """Message level color last."""
         return (

@@ -145,6 +145,38 @@
       }
     }
   },
+  "entity": {
+    "sensor": {
+      "message_log": {
+        "state_attributes": {
+          "last_message_level": {
+            "name": "Sidste meddelelsesniveau"
+          },
+          "last_message_source": {
+            "name": "Sidste meddelelseskilde"
+          },
+          "last_message_added_at": {
+            "name": "Sidste opdatering"
+          },
+          "highest_message_level": {
+            "name": "Højeste meddelelsesniveau"
+          },
+          "markdown": {
+            "name": "Markdown"
+          },
+          "markdown_message_list": {
+            "name": "Markdown meddelelse liste"
+          },
+          "markdown_settings": {
+            "name": "Markdown indstillinger"
+          },
+          "message_list": {
+            "name": "Meddelelse liste"
+          }
+        }
+      }
+    }
+  },
   "device_automation": {
     "trigger_type": {
       "new_log_entry": "Ny log registrering",

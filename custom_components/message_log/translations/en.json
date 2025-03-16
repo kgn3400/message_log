@@ -145,6 +145,38 @@
       }
     }
   },
+  "entity": {
+    "sensor": {
+      "message_log": {
+        "state_attributes": {
+          "last_message_level": {
+            "name": "Last message level"
+          },
+          "last_message_source": {
+            "name": "Last message source"
+          },
+          "last_message_added_at": {
+            "name": "Last update"
+          },
+          "highest_message_level": {
+            "name": "Highest message level"
+          },
+          "markdown": {
+            "name": "Markdown"
+          },
+          "markdown_message_list": {
+            "name": "Markdown message list"
+          },
+          "markdown_settings": {
+            "name": "Markdown settings"
+          },
+          "message_list": {
+            "name": "Message list"
+          }
+        }
+      }
+    }
+  },
   "device_automation": {
     "trigger_type": {
       "new_log_entry": "New log entry",
