@@ -22,8 +22,8 @@ from .const import (
     TRANSLATION_KEY_MISSING_TIMER_ENTITY,
 )
 from .entity import ComponentEntity
+from .hass_util import TimerTrigger, TimerTriggerErrorEnum
 from .message_log_settings import MessageItemAttr
-from .timer_trigger import TimerTrigger, TimerTriggerErrorEnum
 
 
 # ------------------------------------------------------

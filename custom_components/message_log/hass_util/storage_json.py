@@ -9,8 +9,6 @@ import jsonpickle
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 
-from .const import DOMAIN
-
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
@@ -48,7 +46,7 @@ class StorageJson:
     def __init__(
         self,
         hass: HomeAssistant,
-        key: str = DOMAIN,
+        key: str,
         version: int = 1,
         minor_version: int = 1,
         async_migrate_func: Callable[[int, int, Any], Any] | None = None,

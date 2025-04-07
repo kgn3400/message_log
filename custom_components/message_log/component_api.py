@@ -22,6 +22,7 @@ from .const import (
     SOURCE_SERVICE,
     TRANSLATE_EXTRA,
 )
+from .hass_util import Translate
 from .message_log_settings import (
     MessageItem,
     MessageLevel,
@@ -29,7 +30,6 @@ from .message_log_settings import (
     MessageListShow,
     MessageLogSettings,
 )
-from .translate import Translate
 
 
 # ------------------------------------------------------------------

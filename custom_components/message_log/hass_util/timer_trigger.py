@@ -176,8 +176,18 @@ class TimerTrigger:
                     await self.async_restart_timer()
 
         else:
+            self.entity.async_on_remove(self.async_remove_from_hass)
+
             self.unsub_async_track_point_in_utc_time = async_track_point_in_utc_time(
                 self.entity.hass,
                 self.async_point_in_time_listener,
                 dt_util.utcnow() + self.duration,
             )
+
+    # ------------------------------------------------------
+    @callback
+    def async_remove_from_hass(self) -> None:
+        """Handle removal from Hass."""
+        if self.unsub_async_track_point_in_utc_time:
+            self.unsub_async_track_point_in_utc_time()
+            self.unsub_async_track_point_in_utc_time = None

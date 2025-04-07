@@ -8,7 +8,7 @@ from functools import total_ordering
 from homeassistant.core import HomeAssistant
 
 from .const import STORAGE_KEY, STORAGE_VERSION
-from .storage_json import StorageJson
+from .hass_util import StorageJson
 
 
 # ------------------------------------------------------
