@@ -1,4 +1,7 @@
-"""Settings handling."""
+"""Json storage.
+
+External imports: jsonpickle
+"""
 
 from collections.abc import Callable
 import inspect
@@ -41,7 +44,12 @@ class StoreMigrate(Store):
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 class StorageJson:
-    """Settings class."""
+    """Json storage class.
+
+    This class is used to store data in a json file.
+
+    External imports: jsonpickle
+    """
 
     def __init__(
         self,

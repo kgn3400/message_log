@@ -1,4 +1,7 @@
-"""Timer trigger class."""
+"""Timer trigger.
+
+External imports: None
+"""
 
 from datetime import datetime, timedelta
 from enum import Enum
@@ -32,7 +35,11 @@ class TimerTriggerErrorEnum(Enum):
 # ------------------------------------------------------
 # ------------------------------------------------------
 class TimerTrigger:
-    """Timer trigger class."""
+    """Timer trigger class.
+
+    External imports: None
+
+    """
 
     restarting_timer: bool = False
 

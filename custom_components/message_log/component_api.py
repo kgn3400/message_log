@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from functools import partial
 
 from babel.dates import format_timedelta
 
@@ -22,7 +21,7 @@ from .const import (
     SOURCE_SERVICE,
     TRANSLATE_EXTRA,
 )
-from .hass_util import Translate
+from .hass_util import Translate, async_hass_add_executor_job
 from .message_log_settings import (
     MessageItem,
     MessageLevel,
@@ -176,28 +175,19 @@ class ComponentApi:
         """Relative time received."""
 
         return (
-            self.translations.received_str
-            + " "
-            + await self.async_relative_time(date_time)
+            self.translations.received_str + " " + await self.relative_time(date_time)
         )
 
     # ------------------------------------------------------------------
-    async def async_relative_time(self, date_time: datetime) -> str:
+    @async_hass_add_executor_job()
+    def relative_time(self, date_time: datetime) -> str:
         """Relative time."""
 
-        now = datetime.now(UTC)
-        diff: timedelta = date_time - now
-        # diff: timedelta = now - date_time
+        diff: timedelta = date_time - datetime.now(UTC)
 
-        diff_str: str = await self.hass.async_add_executor_job(
-            partial(
-                format_timedelta,
-                delta=diff,
-                add_direction=True,
-                locale=self.translate.acive_language,
-            )
+        return format_timedelta(
+            diff, add_direction=True, locale=self.translate.acive_language
         )
-        return diff_str
 
     # ------------------------------------------------------------------
     async def async_remove_messages_service(self, call: ServiceCall) -> None:
