@@ -2,75 +2,11 @@
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from enum import Enum
-from functools import total_ordering
 
 from homeassistant.core import HomeAssistant
 
 from .const import STORAGE_KEY, STORAGE_VERSION
-from .hass_util import StorageJson
-
-
-# ------------------------------------------------------
-# ------------------------------------------------------
-@total_ordering
-class EnumExt(Enum):
-    """Enu ext."""
-
-    def __lt__(self, other):
-        """Lower than."""
-        try:
-            return self.value < other.value
-        except AttributeError:
-            return self.value < other
-
-    def __eq__(self, other):
-        """Equal."""
-        try:
-            return self.value == other.value
-        except AttributeError:
-            return self.value == other
-
-    # ------------------------------------------------------
-    def succ(self, cycle: bool = False):
-        """Succ."""
-        cls = self.__class__
-        members = list(cls)
-        index = members.index(self) + 1
-
-        if index >= len(members):
-            if cycle:
-                index = 0
-            else:
-                raise StopIteration("end of enumeration reached")
-
-        return members[index]
-
-    # ------------------------------------------------------
-    @property
-    def next(self):
-        """Next."""
-        return self.succ()
-
-    # ------------------------------------------------------
-    def pred(self, cycle: bool = False):
-        """Pred."""
-        cls = self.__class__
-        members = list(cls)
-        index = members.index(self) - 1
-        if index < 0:
-            if cycle:
-                index = len(members) - 1
-            else:
-                raise StopIteration("beginning of enumeration reached")
-
-        return members[index]
-
-    # ------------------------------------------------------
-    @property
-    def prev(self):
-        """Prev."""
-        return self.pred()
+from .hass_util import EnumExt, StorageJson
 
 
 # ------------------------------------------------------

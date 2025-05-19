@@ -10,6 +10,7 @@ External imports:
     translate: aiofiles, orjson
 """
 
+from .enum_ext import EnumExt  # noqa: F401
 from .handle_retries import (  # noqa: F401
     HandleRetries,
     HandleRetriesException,
