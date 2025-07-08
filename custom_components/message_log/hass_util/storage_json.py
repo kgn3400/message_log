@@ -71,6 +71,7 @@ class StorageJson:
             minor_version=minor_version,
         )
         self.store___.custom_migrate_func = async_migrate_func
+        self.base_class___ = self.__class__ is StorageJson
 
     # ------------------------------------------------------------------
     async def async_read_settings(self) -> dict | None:
@@ -78,7 +79,6 @@ class StorageJson:
 
         tmp_dict: dict = None
 
-        jsonpickle.set_encoder_options("json", ensure_ascii=False)
         data = await self.store___.async_load()
 
         if data is None:
@@ -86,18 +86,19 @@ class StorageJson:
 
         if type(data) is dict:
             if self.DICT_KEY___ in data:
+                jsonpickle.set_encoder_options("json", ensure_ascii=False)
                 tmp_obj = self.decode_data(data[self.DICT_KEY___])
                 del data[self.DICT_KEY___]
 
-                if len(data) > 0:
-                    tmp_dict = data
+            if len(data) > 0:
+                tmp_dict = data
         else:
             tmp_obj = self.decode_data(data)
 
-        if hasattr(tmp_obj, "__dict__") is False:
-            return tmp_dict
-
-        self.__dict__.update(tmp_obj.__dict__)
+        if not self.base_class___:
+            if not hasattr(tmp_obj, "__dict__"):
+                return tmp_dict
+            self.__dict__.update(tmp_obj.__dict__)
 
         return tmp_dict
 
@@ -112,9 +113,13 @@ class StorageJson:
 
         jsonpickle.set_encoder_options("json", ensure_ascii=False)
 
-        await self.store___.async_save(
-            {self.DICT_KEY___: self.encode_data(self), **extra_data}
-        )
+        if self.base_class___:
+            await self.store___.async_save(extra_data)
+
+        else:
+            await self.store___.async_save(
+                {self.DICT_KEY___: self.encode_data(self), **extra_data}
+            )
 
     # ------------------------------------------------------------------
     def encode_data(self, data: Any):
@@ -134,6 +139,7 @@ class StorageJson:
         del tmp_dict["hass___"]
         del tmp_dict["store___"]
         del tmp_dict["DICT_KEY___"]
+        del tmp_dict["base_class___"]
 
         if self.write_hidden_attributes___ is False:
             try:
